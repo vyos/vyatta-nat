@@ -1,0 +1,2 @@
+help: Clear NAT counters
+run: sudo iptables -Z -t nat

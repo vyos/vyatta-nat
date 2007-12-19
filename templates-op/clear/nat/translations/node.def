@@ -1,0 +1,2 @@
+help: Clear NAT translations
+run: sudo ${vyatta_sbindir}/vyatta-update-nat.pl clearnattranslations

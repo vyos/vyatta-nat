@@ -1,0 +1,6 @@
+The Debian Package vyatta-nat
+----------------------------
+
+This package has the Vyatta configuration and operational templates and scripts for NAT.
+
+ -- An-Cheng Huang <ancheng@vyatta.com>  Tue, 18 Dec 2007 11:59:49 -0700

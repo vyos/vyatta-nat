@@ -1,0 +1,3 @@
+help: Show statistics for configured NAT rules
+run: sudo ${vyatta_bindir}/sudo-users/vyatta-show-nat.pl \
+       ${vyatta_datadir}/xsl/show_nat_statistics.xsl

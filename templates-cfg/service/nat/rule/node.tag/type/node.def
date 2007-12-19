@@ -1,0 +1,4 @@
+type:  txt
+help: "Source, destination, or masquerade NAT"
+syntax: ($(@) == "source" || $(@) == "destination" || $(@) == "masquerade") ; \
+"invalid type $(@)"

@@ -1,0 +1,5 @@
+type:  txt
+help: "Inbound interface of NAT traffic"
+## iptables allow any interface names.
+#syntax: exec "sh -c 'if grep -q '\\''^ \\+$(@):'\\'' /proc/net/dev; \
+#then exit 0; else exit 1; fi' " ; "invalid interface $(@)"

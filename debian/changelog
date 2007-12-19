@@ -1,0 +1,5 @@
+vyatta-nat (0.1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- An-Cheng Huang <ancheng@vyatta.com>  Tue, 18 Dec 2007 11:59:49 -0700
