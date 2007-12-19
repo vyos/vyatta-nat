@@ -1,4 +1,7 @@
 type:  txt
 help: "Source, destination, or masquerade NAT"
-syntax: ($(@) == "source" || $(@) == "destination" || $(@) == "masquerade") ; \
-"invalid type $(@)"
+syntax: $(@) in "source", "destination", "masquerade"; "invalid type $(@)"
+#comp_help:Possible completions:
+#  source        Source NAT
+#  destination   Destination NAT
+#  masquerade    Masquerade NAT

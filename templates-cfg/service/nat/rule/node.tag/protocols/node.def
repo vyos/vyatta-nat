@@ -1,3 +1,8 @@
 type:  txt
 help: "Protocol to NAT (this can be a protocol name in /etc/protocols, a protocol number, or \"all\")"
 syntax: exec "/opt/vyatta/sbin/vyatta-validate-type.pl protocol_negate '$(@)'" ; "invalid protocol \"$(@)\""
+#comp_help:Possible completions:
+#  <name>        A protocol name, for example, "tcp"
+#  <number>      A protocol number
+#  all           All protocols
+#(Note: a protocol can also be negated, for example, "!tcp")

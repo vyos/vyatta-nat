@@ -32,7 +32,7 @@ while (<STATS>) {
 }
 close STATS;
 
-open(RENDER, "| /opt/vyatta/libexec/xorp/render_xml $xsl_file") or exit 1;
+open(RENDER, "| /opt/vyatta/sbin/render_xml $xsl_file") or exit 1;
 
 # begin
 print RENDER "<opcommand name='natrules'><format type='row'>\n";
