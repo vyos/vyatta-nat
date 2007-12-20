@@ -10,6 +10,7 @@ my %fields = (
   _inbound_if   => undef,
   _outbound_if  => undef,
   _proto        => undef,
+  _exclude      => undef,
   _source       => {
                     _addr       => undef,
                     _net        => undef,
@@ -78,6 +79,7 @@ sub setup {
   $self->{_inbound_if} = $config->returnValue("inbound-interface");
   $self->{_outbound_if} = $config->returnValue("outbound-interface");
   $self->{_proto} = $config->returnValue("protocols");
+  $self->{_exclude} = $config->exists("exclude");
   
   $self->{_source}->{_addr} = $config->returnValue("source address");
   $self->{_source}->{_net} = $config->returnValue("source network");
@@ -141,6 +143,7 @@ sub setupOrig {
   $self->{_inbound_if} = $config->returnOrigValue("inbound-interface");
   $self->{_outbound_if} = $config->returnOrigValue("outbound-interface");
   $self->{_proto} = $config->returnOrigValue("protocols");
+  $self->{_exclude} = $config->existsOrig("exclude");
   
   $self->{_source}->{_addr} = $config->returnOrigValue("source address");
   $self->{_source}->{_net} = $config->returnOrigValue("source network");
@@ -279,7 +282,9 @@ sub rule_str {
     $can_use_port = 0;
   }
   if (($self->{_type} eq "source") || ($self->{_type} eq "masquerade")) {
-    if ($self->{_type} eq "masquerade") {
+    if ($self->{_exclude}) {
+      $rule_str .= "-j RETURN";
+    } elsif ($self->{_type} eq "masquerade") {
       $rule_str .= "-j MASQUERADE";
     } else {
       $rule_str .= "-j SNAT";
@@ -346,7 +351,11 @@ sub rule_str {
     }
   } else {
     # type is destination
-    $rule_str .= "-j DNAT";
+    if ($self->{_exclude}) {
+      $rule_str .= "-j RETURN";
+    } else {
+      $rule_str .= "-j DNAT";
+    }
   
     if (defined($self->{_inbound_if})) {
       $rule_str .= " -i $self->{_inbound_if}";

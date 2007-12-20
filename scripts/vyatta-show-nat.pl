@@ -25,7 +25,7 @@ while (<STATS>) {
     $skey = "";
   }
 
-  if ($skey ne "" && (m/SNAT/ || m/DNAT/ || m/MASQUERADE/)) {
+  if ($skey ne "" && (m/SNAT/ || m/DNAT/ || m/MASQUERADE/ || m/RETURN/)) {
     m/^\s*(\d+)\s+(\d+)\s/;
     push @{$stats{$skey}}, ($1, $2);
   }
