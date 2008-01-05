@@ -9,6 +9,7 @@ Package: vyatta-nat
 Architecture: all
 Depends: vyatta-cfg,
  vyatta-op,
+ vyatta-op-xml,
  iptables
 Description: Vyatta configuration/operational commands for NAT
  Vyatta configuration and operational templates and scripts for NAT
