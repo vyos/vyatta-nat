@@ -1,3 +1,3 @@
 type:  u32
-help: "Inside port range start"
-syntax: ($(@) > 0 && $(@) < 65536) ; "port must be between 1 and 65535"
+help: Inside port range start
+syntax:expression: ($VAR(@) > 0 && $VAR(@) < 65536) ; "port must be between 1 and 65535"

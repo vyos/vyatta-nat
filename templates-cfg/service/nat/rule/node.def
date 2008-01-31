@@ -1,4 +1,4 @@
 tag:
 type: u32
-help: "Rule number for NAT"
-syntax: ($(@) > 0 && $(@) < 1025) ; "rule number must be between 1 and 1024"
+help: Rule number for NAT
+syntax:expression: ($VAR(@) > 0 && $VAR(@) < 1025) ; "rule number must be between 1 and 1024"

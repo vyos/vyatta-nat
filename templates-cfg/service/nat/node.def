@@ -1,2 +1,2 @@
-help: "NAT configuration"
-end: "sudo /opt/vyatta/sbin/vyatta-update-nat.pl"
+help: NAT configuration
+end:expression: "sudo /opt/vyatta/sbin/vyatta-update-nat.pl"

@@ -1,4 +1,4 @@
 type:  txt
-help: "Inbound interface of NAT traffic"
-#allowed: ls /sys/class/net 2>/dev/null
-#comp_help:Enter a network interface name, for example, "eth0"
+help: Inbound interface of NAT traffic
+allowed: ls /sys/class/net 2>/dev/null
+comp_help:Enter a network interface name, for example, "eth0"

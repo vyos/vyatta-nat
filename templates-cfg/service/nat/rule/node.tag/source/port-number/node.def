@@ -1,4 +1,4 @@
 multi:
 type:  u32
-help: "Numbered source port (ex. 80)"
-syntax: ($(@) > 0 && $(@) < 65536) ; "port must be between 1 and 65535"
+help: Numbered source port (ex. 80)
+syntax:expression: ($VAR(@) > 0 && $VAR(@) < 65536) ; "port must be between 1 and 65535"

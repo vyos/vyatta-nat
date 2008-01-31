@@ -1,1 +1,1 @@
-help: "Exclude packets matching this rule from NAT"
+help: Exclude packets matching this rule from NAT
