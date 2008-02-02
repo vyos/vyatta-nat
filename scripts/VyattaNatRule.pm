@@ -81,8 +81,14 @@ sub setup {
   $self->{_proto} = $config->returnValue("protocol");
   $self->{_exclude} = $config->exists("exclude");
   
+  $self->{_source}->{_net} = undef;
   $self->{_source}->{_addr} = $config->returnValue("source address");
-  $self->{_source}->{_net} = $config->returnValue("source network");
+  if (defined($self->{_source}->{_addr})
+      && ($self->{_source}->{_addr} =~ /\//)) {
+    $self->{_source}->{_net} = $self->{_source}->{_addr};
+    $self->{_source}->{_addr} = undef;
+  }
+
   my @tmp = $config->returnValues("source port-number");
   $self->{_source}->{_port_num} = [ @tmp ];
   @tmp = $config->returnValues("source port-name");
@@ -92,8 +98,14 @@ sub setup {
   $self->{_source}->{_port_range}->{_stop}
     = $config->returnValue("source port-range stop");
 
+  $self->{_destination}->{_net} = undef;
   $self->{_destination}->{_addr} = $config->returnValue("destination address");
-  $self->{_destination}->{_net} = $config->returnValue("destination network");
+  if (defined($self->{_destination}->{_addr})
+      && ($self->{_destination}->{_addr} =~ /\//)) {
+    $self->{_destination}->{_net} = $self->{_destination}->{_addr};
+    $self->{_destination}->{_addr} = undef;
+  }
+
   @tmp = $config->returnValues("destination port-number");
   $self->{_destination}->{_port_num} = [ @tmp ];
   @tmp = $config->returnValues("destination port-name");
@@ -145,8 +157,14 @@ sub setupOrig {
   $self->{_proto} = $config->returnOrigValue("protocol");
   $self->{_exclude} = $config->existsOrig("exclude");
   
+  $self->{_source}->{_net} = undef;
   $self->{_source}->{_addr} = $config->returnOrigValue("source address");
-  $self->{_source}->{_net} = $config->returnOrigValue("source network");
+  if (defined($self->{_source}->{_addr})
+      && ($self->{_source}->{_addr} =~ /\//)) {
+    $self->{_source}->{_net} = $self->{_source}->{_addr};
+    $self->{_source}->{_addr} = undef;
+  }
+
   my @tmp = $config->returnOrigValues("source port-number");
   $self->{_source}->{_port_num} = [ @tmp ];
   @tmp = $config->returnOrigValues("source port-name");
@@ -156,10 +174,15 @@ sub setupOrig {
   $self->{_source}->{_port_range}->{_stop}
     = $config->returnOrigValue("source port-range stop");
 
+  $self->{_destination}->{_net} = undef;
   $self->{_destination}->{_addr}
     = $config->returnOrigValue("destination address");
-  $self->{_destination}->{_net}
-    = $config->returnOrigValue("destination network");
+  if (defined($self->{_destination}->{_addr})
+      && ($self->{_destination}->{_addr} =~ /\//)) {
+    $self->{_destination}->{_net} = $self->{_destination}->{_addr};
+    $self->{_destination}->{_addr} = undef;
+  }
+
   @tmp = $config->returnOrigValues("destination port-number");
   $self->{_destination}->{_port_num} = [ @tmp ];
   @tmp = $config->returnOrigValues("destination port-name");
