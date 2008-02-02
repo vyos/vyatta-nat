@@ -78,7 +78,7 @@ sub setup {
   $self->{_orig_type} = $config->returnOrigValue("type");
   $self->{_inbound_if} = $config->returnValue("inbound-interface");
   $self->{_outbound_if} = $config->returnValue("outbound-interface");
-  $self->{_proto} = $config->returnValue("protocols");
+  $self->{_proto} = $config->returnValue("protocol");
   $self->{_exclude} = $config->exists("exclude");
   
   $self->{_source}->{_addr} = $config->returnValue("source address");
@@ -142,7 +142,7 @@ sub setupOrig {
   $self->{_orig_type} = $config->returnOrigValue("type");
   $self->{_inbound_if} = $config->returnOrigValue("inbound-interface");
   $self->{_outbound_if} = $config->returnOrigValue("outbound-interface");
-  $self->{_proto} = $config->returnOrigValue("protocols");
+  $self->{_proto} = $config->returnOrigValue("protocol");
   $self->{_exclude} = $config->existsOrig("exclude");
   
   $self->{_source}->{_addr} = $config->returnOrigValue("source address");
