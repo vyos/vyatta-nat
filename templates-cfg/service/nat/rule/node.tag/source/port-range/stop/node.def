@@ -1,3 +1,0 @@
-type:  u32
-help: Ending source port range
-syntax:expression: ($VAR(@) > 0 && $VAR(@) < 65536) ; "port must be between 1 and 65535"

@@ -3,6 +3,7 @@ package VyattaNatRule;
 use strict;
 use lib "/opt/vyatta/share/perl5/";
 use VyattaConfig;
+use VyattaMisc;
 
 my %fields = (
   _type	        => undef,
@@ -14,22 +15,12 @@ my %fields = (
   _source       => {
                     _addr       => undef,
                     _net        => undef,
-                    _port_num   => undef,
-                    _port_name  => undef,
-                    _port_range => {
-                                    _start => undef,
-                                    _stop  => undef,
-                                   },
+                    _port       => undef,
                    },
   _destination  => {
                     _addr       => undef,
                     _net        => undef,
-                    _port_num   => undef,
-                    _port_name  => undef,
-                    _port_range => {
-                                    _start => undef,
-                                    _stop  => undef,
-                                   },
+                    _port       => undef,
                    },
   _inside_addr  => {
                     _addr => undef,
@@ -37,11 +28,7 @@ my %fields = (
                                 _start => undef,
                                 _stop  => undef,
                                },
-                    _port_num   => undef,
-                    _port_range => {
-                                    _start => undef,
-                                    _stop  => undef,
-                                   },
+                    _port => undef,
                    },
   _outside_addr => {
                     _addr   => undef,
@@ -49,11 +36,7 @@ my %fields = (
                                 _start => undef,
                                 _stop  => undef,
                                },
-                    _port_num   => undef,
-                    _port_range => {
-                                    _start => undef,
-                                    _stop  => undef,
-                                   },
+                    _port => undef,
                    },
 );
 
@@ -88,15 +71,7 @@ sub setup {
     $self->{_source}->{_net} = $self->{_source}->{_addr};
     $self->{_source}->{_addr} = undef;
   }
-
-  my @tmp = $config->returnValues("source port-number");
-  $self->{_source}->{_port_num} = [ @tmp ];
-  @tmp = $config->returnValues("source port-name");
-  $self->{_source}->{_port_name} = [ @tmp ];
-  $self->{_source}->{_port_range}->{_start}
-    = $config->returnValue("source port-range start");
-  $self->{_source}->{_port_range}->{_stop}
-    = $config->returnValue("source port-range stop");
+  $self->{_source}->{_port} = $config->returnValue("source port");
 
   $self->{_destination}->{_net} = undef;
   $self->{_destination}->{_addr} = $config->returnValue("destination address");
@@ -105,15 +80,7 @@ sub setup {
     $self->{_destination}->{_net} = $self->{_destination}->{_addr};
     $self->{_destination}->{_addr} = undef;
   }
-
-  @tmp = $config->returnValues("destination port-number");
-  $self->{_destination}->{_port_num} = [ @tmp ];
-  @tmp = $config->returnValues("destination port-name");
-  $self->{_destination}->{_port_name} = [ @tmp ];
-  $self->{_destination}->{_port_range}->{_start}
-    = $config->returnValue("destination port-range start");
-  $self->{_destination}->{_port_range}->{_stop}
-    = $config->returnValue("destination port-range stop");
+  $self->{_destination}->{_port} = $config->returnValue("destination port");
   
   $self->{_inside_addr}->{_addr}
     = $config->returnValue("inside-address address");
@@ -121,12 +88,8 @@ sub setup {
     = $config->returnValue("inside-address range start");
   $self->{_inside_addr}->{_range}->{_stop}
     = $config->returnValue("inside-address range stop");
-  $self->{_inside_addr}->{_port_num}
-    = $config->returnValue("inside-address port-number");
-  $self->{_inside_addr}->{_port_range}->{_start}
-    = $config->returnValue("inside-address port-range start");
-  $self->{_inside_addr}->{_port_range}->{_stop}
-    = $config->returnValue("inside-address port-range stop");
+  $self->{_inside_addr}->{_port}
+    = $config->returnValue("inside-address port");
   
   $self->{_outside_addr}->{_addr}
     = $config->returnValue("outside-address address");
@@ -134,12 +97,8 @@ sub setup {
     = $config->returnValue("outside-address range start");
   $self->{_outside_addr}->{_range}->{_stop}
     = $config->returnValue("outside-address range stop");
-  $self->{_outside_addr}->{_port_num}
-    = $config->returnValue("outside-address port-number");
-  $self->{_outside_addr}->{_port_range}->{_start}
-    = $config->returnValue("outside-address port-range start");
-  $self->{_outside_addr}->{_port_range}->{_stop}
-    = $config->returnValue("outside-address port-range stop");
+  $self->{_outside_addr}->{_port}
+    = $config->returnValue("outside-address port");
 
   return 0;
 }
@@ -164,15 +123,7 @@ sub setupOrig {
     $self->{_source}->{_net} = $self->{_source}->{_addr};
     $self->{_source}->{_addr} = undef;
   }
-
-  my @tmp = $config->returnOrigValues("source port-number");
-  $self->{_source}->{_port_num} = [ @tmp ];
-  @tmp = $config->returnOrigValues("source port-name");
-  $self->{_source}->{_port_name} = [ @tmp ];
-  $self->{_source}->{_port_range}->{_start}
-    = $config->returnOrigValue("source port-range start");
-  $self->{_source}->{_port_range}->{_stop}
-    = $config->returnOrigValue("source port-range stop");
+  $self->{_source}->{_port} = $config->returnOrigValue("source port");
 
   $self->{_destination}->{_net} = undef;
   $self->{_destination}->{_addr}
@@ -182,15 +133,8 @@ sub setupOrig {
     $self->{_destination}->{_net} = $self->{_destination}->{_addr};
     $self->{_destination}->{_addr} = undef;
   }
-
-  @tmp = $config->returnOrigValues("destination port-number");
-  $self->{_destination}->{_port_num} = [ @tmp ];
-  @tmp = $config->returnOrigValues("destination port-name");
-  $self->{_destination}->{_port_name} = [ @tmp ];
-  $self->{_destination}->{_port_range}->{_start}
-    = $config->returnOrigValue("destination port-range start");
-  $self->{_destination}->{_port_range}->{_stop}
-    = $config->returnOrigValue("destination port-range stop");
+  $self->{_destination}->{_port}
+    = $config->returnOrigValue("destination port");
   
   $self->{_inside_addr}->{_addr}
     = $config->returnOrigValue("inside-address address");
@@ -198,12 +142,8 @@ sub setupOrig {
     = $config->returnOrigValue("inside-address range start");
   $self->{_inside_addr}->{_range}->{_stop}
     = $config->returnOrigValue("inside-address range stop");
-  $self->{_inside_addr}->{_port_num}
-    = $config->returnOrigValue("inside-address port-number");
-  $self->{_inside_addr}->{_port_range}->{_start}
-    = $config->returnOrigValue("inside-address port-range start");
-  $self->{_inside_addr}->{_port_range}->{_stop}
-    = $config->returnOrigValue("inside-address port-range stop");
+  $self->{_inside_addr}->{_port}
+    = $config->returnOrigValue("inside-address port");
   
   $self->{_outside_addr}->{_addr}
     = $config->returnOrigValue("outside-address address");
@@ -211,83 +151,68 @@ sub setupOrig {
     = $config->returnOrigValue("outside-address range start");
   $self->{_outside_addr}->{_range}->{_stop}
     = $config->returnOrigValue("outside-address range stop");
-  $self->{_outside_addr}->{_port_num}
-    = $config->returnOrigValue("outside-address port-number");
-  $self->{_outside_addr}->{_port_range}->{_start}
-    = $config->returnOrigValue("outside-address port-range start");
-  $self->{_outside_addr}->{_port_range}->{_stop}
-    = $config->returnOrigValue("outside-address port-range stop");
+  $self->{_outside_addr}->{_port}
+    = $config->returnOrigValue("outside-address port");
 
   return 0;
 }
 
 sub handle_ports {
-  my $num_ref = shift;
-  my $name_ref = shift;
-  my $pstart = shift;
-  my $pstop = shift;
+  my $port_str = shift;
   my $can_use_port = shift;
   my $prefix = shift;
   my $proto = shift;
-
-  my $rule_str = "";
-  my ($ports, $prange) = (0, 0);
-  my @pnums = @{$num_ref};
-  my @pnames = @{$name_ref};
-  $ports = ($#pnums + 1) + ($#pnames + 1);
-
-  if (defined($pstart) && defined($pstop)) {
-    if ($pstop < $pstart) {
-      return (undef, "invalid port range $pstart-$pstop");
-    }
-    $ports += ($pstop - $pstart + 1);
-    $prange = ($pstop - $pstart - 1);
+  my $negate = '';
+  if ($port_str =~ /^!(.*)$/) {
+    $port_str = $1;
+    $negate = '! ';
   }
-  if (($ports > 0) && (!$can_use_port)) {
+  $port_str =~ s/-/:/g;
+
+  my $num_ports = 0;
+  my @port_specs = split /,/, $port_str;
+  foreach my $port_spec (@port_specs) {
+    my ($success, $err) = (undef, undef);
+    if ($port_spec =~ /:/) {
+      ($success, $err) = VyattaMisc::isValidPortRange($port_spec, ':');
+      if (defined($success)) {
+        $num_ports += 2;
+        next;
+      } else {
+        return (undef, $err);
+      }
+    }
+    if ($port_spec =~ /^\d/) {
+      ($success, $err) = VyattaMisc::isValidPortNumber($port_spec);
+      if (defined($success)) {
+        $num_ports += 1;
+        next;
+      } else {
+        return (undef, $err);
+      }
+    }
+    ($success, $err) = VyattaMisc::isValidPortName($port_spec, $proto);
+    if (defined($success)) {
+      $num_ports += 1;
+      next;
+    } else {
+      return (undef, $err);
+    }
+  }
+
+  my $rule_str = '';
+  if (($num_ports > 0) && (!$can_use_port)) {
     return (undef, "ports can only be specified when protocol is \"tcp\" "
                    . "or \"udp\" (currently \"$proto\")");
   }
-  if (($ports - $prange) > 15) {
+  if ($num_ports > 15) {
     return (undef, "source/destination port specification only supports "
                    . "up to 15 ports (port range counts as 2)");
   }
-  if ($ports > 1) {
-    $rule_str .= " -m multiport --${prefix}ports ";
-    my $first = 1;
-    if ($#pnums >= 0) {
-      my $pstr = join(',', @pnums);
-      $rule_str .= "$pstr";
-      $first = 0;
-    }
-    if ($#pnames >= 0) {
-      if ($first == 0) {
-        $rule_str .= ",";
-      }
-      my $pstr = join(',', @pnames);
-      $rule_str .= "$pstr";
-      $first = 0;
-    }
-    if (defined($pstart) && defined($pstop)) {
-      if ($first == 0) {
-        $rule_str .= ",";
-      }
-      if ($pstart == $pstop) {
-        $rule_str .= "$pstart";
-      } else {
-        $rule_str .= "$pstart:$pstop";
-      }
-      $first = 0;
-    }
-  } elsif ($ports > 0) {
-    $rule_str .= " --${prefix}port ";
-    if ($#pnums >= 0) {
-      $rule_str .= "$pnums[0]";
-    } elsif ($#pnames >= 0) {
-      $rule_str .= "$pnames[0]";
-    } else {
-      # no number, no name, range of 1
-      $rule_str .= "$pstart";
-    }
+  if ($num_ports > 1) {
+    $rule_str = " -m multiport --${prefix}ports ${negate}${port_str}";
+  } elsif ($num_ports > 0) {
+    $rule_str = " --${prefix}port ${negate}${port_str}";
   }
 
   return ($rule_str, undef);
@@ -341,7 +266,7 @@ sub rule_str {
       return (undef, "cannot specify outside IP address with \"masquerade\"");
     }
 
-    if (defined($self->{_outside_addr}->{_port_num})) {
+    if (defined($self->{_outside_addr}->{_port})) {
       if (!$can_use_port) {
         return (undef, "ports can only be specified when protocol is \"tcp\" "
                        . "or \"udp\" (currently \"$self->{_proto}\")");
@@ -349,18 +274,17 @@ sub rule_str {
       if ($self->{_type} ne "masquerade") {
         $to_src .= ":";
       }
-      $to_src .= "$self->{_outside_addr}->{_port_num}";
-    } elsif (defined($self->{_outside_addr}->{_port_range}->{_start})
-             && defined($self->{_outside_addr}->{_port_range}->{_stop})) {
-      if (!$can_use_port) {
-        return (undef, "ports can only be specified when protocol is \"tcp\" "
-                       . "or \"udp\" (currently \"$self->{_proto}\")");
+      my ($success, $err) = (undef, undef);
+      if ($self->{_outside_addr}->{_port} =~ /-/) {
+        ($success, $err)
+          = VyattaMisc::isValidPortRange($self->{_outside_addr}->{_port}, '-');
+        return (undef, $err) if (!defined($success));
+      } else {
+        ($success, $err)
+          = VyattaMisc::isValidPortNumber($self->{_outside_addr}->{_port});
+        return (undef, $err) if (!defined($success));
       }
-      if ($self->{_type} ne "masquerade") {
-        $to_src .= ":";
-      }
-      $to_src .= "$self->{_outside_addr}->{_port_range}->{_start}";
-      $to_src .= "-$self->{_outside_addr}->{_port_range}->{_stop}";
+      $to_src .= "$self->{_outside_addr}->{_port}";
     }
     
     if ($to_src ne "") {
@@ -400,21 +324,25 @@ sub rule_str {
       $to_dst .= "$self->{_inside_addr}->{_range}->{_start}";
       $to_dst .= "-$self->{_inside_addr}->{_range}->{_stop}";
     } 
-    if (defined($self->{_inside_addr}->{_port_num})) {
+    
+    if (defined($self->{_inside_addr}->{_port})) {
       if (!$can_use_port) {
         return (undef, "ports can only be specified when protocol is \"tcp\" "
                        . "or \"udp\" (currently \"$self->{_proto}\")");
       }
-      $to_dst .= ":$self->{_inside_addr}->{_port_num}";
-    } elsif (defined($self->{_inside_addr}->{_port_range}->{_start})
-             && defined($self->{_inside_addr}->{_port_range}->{_stop})) {
-      if (!$can_use_port) {
-        return (undef, "ports can only be specified when protocol is \"tcp\" "
-                       . "or \"udp\" (currently \"$self->{_proto}\")");
+      my ($success, $err) = (undef, undef);
+      if ($self->{_inside_addr}->{_port} =~ /-/) {
+        ($success, $err)
+          = VyattaMisc::isValidPortRange($self->{_inside_addr}->{_port}, '-');
+        return (undef, $err) if (!defined($success));
+      } else {
+        ($success, $err)
+          = VyattaMisc::isValidPortNumber($self->{_inside_addr}->{_port});
+        return (undef, $err) if (!defined($success));
       }
-      $to_dst .= ":$self->{_inside_addr}->{_port_range}->{_start}";
-      $to_dst .= "-$self->{_inside_addr}->{_port_range}->{_stop}";
+      $to_dst .= ":$self->{_inside_addr}->{_port}";
     }
+    
     if ($to_dst ne " --to-destination ") {
       $rule_str .= $to_dst;
     } else {
@@ -424,20 +352,14 @@ sub rule_str {
 
   # source port(s)
   my ($port_str, $port_err)
-    = handle_ports($self->{_source}->{_port_num},
-                   $self->{_source}->{_port_name},
-                   $self->{_source}->{_port_range}->{_start},
-                   $self->{_source}->{_port_range}->{_stop},
+    = handle_ports($self->{_source}->{_port},
                    $can_use_port, "s", $self->{_proto});
   return (undef, $port_err) if (!defined($port_str));
   $rule_str .= $port_str;
   
   # destination port(s)
   ($port_str, $port_err)
-    = handle_ports($self->{_destination}->{_port_num},
-                   $self->{_destination}->{_port_name},
-                   $self->{_destination}->{_port_range}->{_start},
-                   $self->{_destination}->{_port_range}->{_stop},
+    = handle_ports($self->{_destination}->{_port},
                    $can_use_port, "d", $self->{_proto});
   return (undef, $port_err) if (!defined($port_str));
   $rule_str .= $port_str;
@@ -561,4 +483,6 @@ sub outputXml {
   
   # no proto? ($self->{_proto})
 }
+
+1;
 
