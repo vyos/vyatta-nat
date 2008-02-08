@@ -157,67 +157,6 @@ sub setupOrig {
   return 0;
 }
 
-sub handle_ports {
-  my $port_str = shift;
-  my $can_use_port = shift;
-  my $prefix = shift;
-  my $proto = shift;
-  my $negate = '';
-  if ($port_str =~ /^!(.*)$/) {
-    $port_str = $1;
-    $negate = '! ';
-  }
-  $port_str =~ s/-/:/g;
-
-  my $num_ports = 0;
-  my @port_specs = split /,/, $port_str;
-  foreach my $port_spec (@port_specs) {
-    my ($success, $err) = (undef, undef);
-    if ($port_spec =~ /:/) {
-      ($success, $err) = VyattaMisc::isValidPortRange($port_spec, ':');
-      if (defined($success)) {
-        $num_ports += 2;
-        next;
-      } else {
-        return (undef, $err);
-      }
-    }
-    if ($port_spec =~ /^\d/) {
-      ($success, $err) = VyattaMisc::isValidPortNumber($port_spec);
-      if (defined($success)) {
-        $num_ports += 1;
-        next;
-      } else {
-        return (undef, $err);
-      }
-    }
-    ($success, $err) = VyattaMisc::isValidPortName($port_spec, $proto);
-    if (defined($success)) {
-      $num_ports += 1;
-      next;
-    } else {
-      return (undef, $err);
-    }
-  }
-
-  my $rule_str = '';
-  if (($num_ports > 0) && (!$can_use_port)) {
-    return (undef, "ports can only be specified when protocol is \"tcp\" "
-                   . "or \"udp\" (currently \"$proto\")");
-  }
-  if ($num_ports > 15) {
-    return (undef, "source/destination port specification only supports "
-                   . "up to 15 ports (port range counts as 2)");
-  }
-  if ($num_ports > 1) {
-    $rule_str = " -m multiport --${prefix}ports ${negate}${port_str}";
-  } elsif ($num_ports > 0) {
-    $rule_str = " --${prefix}port ${negate}${port_str}";
-  }
-
-  return ($rule_str, undef);
-}
-
 # returns (rule, error)
 sub rule_str {
   my ($self) = @_;
@@ -352,15 +291,15 @@ sub rule_str {
 
   # source port(s)
   my ($port_str, $port_err)
-    = handle_ports($self->{_source}->{_port},
-                   $can_use_port, "s", $self->{_proto});
+    = VyattaMisc::getPortRuleString($self->{_source}->{_port},
+                                    $can_use_port, "s", $self->{_proto});
   return (undef, $port_err) if (!defined($port_str));
   $rule_str .= $port_str;
   
   # destination port(s)
   ($port_str, $port_err)
-    = handle_ports($self->{_destination}->{_port},
-                   $can_use_port, "d", $self->{_proto});
+    = VyattaMisc::getPortRuleString($self->{_destination}->{_port},
+                                    $can_use_port, "d", $self->{_proto});
   return (undef, $port_err) if (!defined($port_str));
   $rule_str .= $port_str;
 
