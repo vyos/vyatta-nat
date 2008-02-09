@@ -84,19 +84,27 @@ sub setup {
   
   $self->{_inside_addr}->{_addr}
     = $config->returnValue("inside-address address");
-  $self->{_inside_addr}->{_range}->{_start}
-    = $config->returnValue("inside-address range start");
-  $self->{_inside_addr}->{_range}->{_stop}
-    = $config->returnValue("inside-address range stop");
+  $self->{_inside_addr}->{_range}->{_start} = undef;
+  $self->{_inside_addr}->{_range}->{_stop} = undef;
+  if (defined($self->{_inside_addr}->{_addr})
+      && $self->{_inside_addr}->{_addr} =~ /^([^-]+)-([^-]+)$/) {
+    $self->{_inside_addr}->{_range}->{_start} = $1;
+    $self->{_inside_addr}->{_range}->{_stop} = $2;
+    $self->{_inside_addr}->{_addr} = undef;
+  }
   $self->{_inside_addr}->{_port}
     = $config->returnValue("inside-address port");
   
   $self->{_outside_addr}->{_addr}
     = $config->returnValue("outside-address address");
-  $self->{_outside_addr}->{_range}->{_start}
-    = $config->returnValue("outside-address range start");
-  $self->{_outside_addr}->{_range}->{_stop}
-    = $config->returnValue("outside-address range stop");
+  $self->{_outside_addr}->{_range}->{_start} = undef;
+  $self->{_outside_addr}->{_range}->{_stop} = undef;
+  if (defined($self->{_outside_addr}->{_addr})
+      && $self->{_outside_addr}->{_addr} =~ /^([^-]+)-([^-]+)$/) {
+    $self->{_outside_addr}->{_range}->{_start} = $1;
+    $self->{_outside_addr}->{_range}->{_stop} = $2;
+    $self->{_outside_addr}->{_addr} = undef;
+  }
   $self->{_outside_addr}->{_port}
     = $config->returnValue("outside-address port");
 
@@ -138,19 +146,27 @@ sub setupOrig {
   
   $self->{_inside_addr}->{_addr}
     = $config->returnOrigValue("inside-address address");
-  $self->{_inside_addr}->{_range}->{_start}
-    = $config->returnOrigValue("inside-address range start");
-  $self->{_inside_addr}->{_range}->{_stop}
-    = $config->returnOrigValue("inside-address range stop");
+  $self->{_inside_addr}->{_range}->{_start} = undef;
+  $self->{_inside_addr}->{_range}->{_stop} = undef;
+  if (defined($self->{_inside_addr}->{_addr})
+      && $self->{_inside_addr}->{_addr} =~ /^([^-]+)-([^-]+)$/) {
+    $self->{_inside_addr}->{_range}->{_start} = $1;
+    $self->{_inside_addr}->{_range}->{_stop} = $2;
+    $self->{_inside_addr}->{_addr} = undef;
+  }
   $self->{_inside_addr}->{_port}
     = $config->returnOrigValue("inside-address port");
   
   $self->{_outside_addr}->{_addr}
     = $config->returnOrigValue("outside-address address");
-  $self->{_outside_addr}->{_range}->{_start}
-    = $config->returnOrigValue("outside-address range start");
-  $self->{_outside_addr}->{_range}->{_stop}
-    = $config->returnOrigValue("outside-address range stop");
+  $self->{_outside_addr}->{_range}->{_start} = undef;
+  $self->{_outside_addr}->{_range}->{_stop} = undef;
+  if (defined($self->{_outside_addr}->{_addr})
+      && $self->{_outside_addr}->{_addr} =~ /^([^-]+)-([^-]+)$/) {
+    $self->{_outside_addr}->{_range}->{_start} = $1;
+    $self->{_outside_addr}->{_range}->{_stop} = $2;
+    $self->{_outside_addr}->{_addr} = undef;
+  }
   $self->{_outside_addr}->{_port}
     = $config->returnOrigValue("outside-address port");
 
@@ -344,28 +360,18 @@ sub print_str {
   "type[$self->{_type}] " .
   "in_if[$self->{_inbound_if}] out_if[$self->{_outbound_if}] " .
   "proto[$self->{_proto}] saddr[$self->{_source}->{_addr}] ".
-  "snet[$self->{_source}->{_net}] spnum[@{$self->{_source}->{_port_num}}] ".
-  "spname[@{$self->{_source}->{_port_name}}] " .
-  "sprange[$self->{_source}->{_port_range}->{_start}" .
-  "-$self->{_source}->{_port_range}->{_stop}] " .
+  "snet[$self->{_source}->{_net}] sp[@{$self->{_source}->{_port}}] ".
   "daddr[$self->{_destination}->{_addr}] " .
   "dnet[$self->{_destination}->{_net}] " .
-  "dpnum[@{$self->{_destination}->{_port_num}}] " .
-  "dpname[@{$self->{_destination}->{_port_name}}] " .
-  "dprange[$self->{_destination}->{_port_range}->{_start}-" .
-  "$self->{_destination}->{_port_range}->{_stop}] " .
+  "dp[@{$self->{_destination}->{_port}}] " .
   "inaddr[$self->{_inside_addr}->{_addr}] " .
   "inrange[$self->{_inside_addr}->{_range}->{_start}-" .
   "$self->{_inside_addr}->{_range}->{_stop}] " .
-  "inp[$self->{_inside_addr}->{_port_num}] " .
-  "inprange[$self->{_inside_addr}->{_port_range}->{_start}-" .
-  "$self->{_inside_addr}->{_port_range}->{_stop}] " .
+  "inp[$self->{_inside_addr}->{_port}] " .
   "outaddr[$self->{_outside_addr}->{_addr}] " .
   "outrange[$self->{_outside_addr}->{_range}->{_start}-" .
-  "$self->{_outside_addr}->{_range}->{_stop}]";
-  "outp[$self->{_outside_addr}->{_port_num}] " .
-  "outprange[$self->{_outside_addr}->{_port_range}->{_start}-" .
-  "$self->{_outside_addr}->{_port_range}->{_stop}] " .
+  "$self->{_outside_addr}->{_range}->{_stop}]" .
+  "outp[$self->{_outside_addr}->{_port}] ";
 
   return $str;
 }

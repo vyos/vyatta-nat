@@ -1,2 +1,5 @@
-type:  ipv4
-help: Inside address to NAT
+type: txt
+help: Configure inside IP address or range for NAT
+comp_help: Possible completions:
+  <IP address>                  NAT to the specified IP address
+  <IP address>-<IP address>     NAT to the specified IP range
