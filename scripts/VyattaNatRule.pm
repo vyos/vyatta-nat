@@ -382,43 +382,22 @@ sub outputXml {
   outputXmlElem("out_interface", $self->{_outbound_if}, $fh);
   outputXmlElem("src_addr", $self->{_source}->{_addr}, $fh);
   outputXmlElem("src_network", $self->{_source}->{_net}, $fh);
-  outputXmlElem("src_ports", join(',', @{$self->{_source}->{_port_num}}), $fh);
-  outputXmlElem("src_ports_apps", join(',', @{$self->{_source}->{_port_name}}),
-                $fh);
-  outputXmlElem("src_port_start", $self->{_source}->{_port_range}->{_start},
-                $fh);
-  outputXmlElem("src_port_stop", $self->{_source}->{_port_range}->{_stop},
-                $fh);
+  outputXmlElem("src_ports", $self->{_source}->{_port}, $fh);
   outputXmlElem("dst_addr", $self->{_destination}->{_addr}, $fh);
   outputXmlElem("dst_network", $self->{_destination}->{_net}, $fh);
-  outputXmlElem("dst_ports", join(',', @{$self->{_destination}->{_port_num}}),
-                $fh);
-  outputXmlElem("dst_ports_apps",
-                join(',', @{$self->{_destination}->{_port_name}}), $fh);
-  outputXmlElem("dst_port_start",
-                $self->{_destination}->{_port_range}->{_start}, $fh);
-  outputXmlElem("dst_port_stop",
-                $self->{_destination}->{_port_range}->{_stop}, $fh);
+  outputXmlElem("dst_ports", $self->{_destination}->{_port}, $fh);
   outputXmlElem("in_addr", $self->{_inside_addr}->{_addr}, $fh);
   outputXmlElem("in_addr_start", $self->{_inside_addr}->{_range}->{_start},
                 $fh);
   outputXmlElem("in_addr_stop", $self->{_inside_addr}->{_range}->{_stop},
                 $fh);
-  outputXmlElem("in_port", $self->{_inside_addr}->{_port_num}, $fh);
-  outputXmlElem("in_port_start",
-                $self->{_inside_addr}->{_port_range}->{_start}, $fh);
-  outputXmlElem("in_port_stop",
-                $self->{_inside_addr}->{_port_range}->{_stop}, $fh);
+  outputXmlElem("in_port", $self->{_inside_addr}->{_port}, $fh);
   outputXmlElem("out_addr", $self->{_outside_addr}->{_addr}, $fh);
   outputXmlElem("out_addr_start", $self->{_outside_addr}->{_range}->{_start},
                 $fh);
   outputXmlElem("out_addr_stop", $self->{_outside_addr}->{_range}->{_stop},
                 $fh);
-  outputXmlElem("out_port", $self->{_outside_addr}->{_port_num}, $fh);
-  outputXmlElem("out_port_start",
-                $self->{_outside_addr}->{_port_range}->{_start}, $fh);
-  outputXmlElem("out_port_stop",
-                $self->{_outside_addr}->{_port_range}->{_stop}, $fh);
+  outputXmlElem("out_port", $self->{_outside_addr}->{_port}, $fh);
   
   # no proto? ($self->{_proto})
 }

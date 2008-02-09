@@ -172,21 +172,13 @@
 
   <xsl:text>&newln;</xsl:text>
 
-
-  <xsl:if test="src_ports!='' or dst_ports!=''">
+  <xsl:if test="src_ports!=''">
     <xsl:variable name="src_ports_d">
       <xsl:call-template name="decode">
         <xsl:with-param name="encoded" select="src_ports"/>
       </xsl:call-template>
     </xsl:variable>
 
-    <xsl:variable name="dst_ports_d">
-      <xsl:call-template name="decode">
-        <xsl:with-param name="encoded" select="dst_ports"/>
-      </xsl:call-template>
-    </xsl:variable>
-
-    <xsl:value-of select="$pad6"/>
     <xsl:value-of select="$pad6"/>
     <xsl:value-of select="$pad6"/>
     <xsl:value-of select="$pad11"/>
@@ -201,102 +193,26 @@
         <xsl:value-of select="substring($pad20,1,$pad20_len - string-length($src_ports_d))"/>
       </xsl:when> 
     </xsl:choose>
+    <xsl:text>&newln;</xsl:text>
+  </xsl:if>
+
+  <xsl:if test="dst_ports!=''">
+    <xsl:variable name="dst_ports_d">
+      <xsl:call-template name="decode">
+        <xsl:with-param name="encoded" select="dst_ports"/>
+      </xsl:call-template>
+    </xsl:variable>
+
+    <xsl:value-of select="$pad6"/>
+    <xsl:value-of select="$pad6"/>
+    <xsl:value-of select="$pad11"/>
+    <xsl:value-of select="$pad11"/>
+    <xsl:value-of select="$pad20"/>
 
     <xsl:choose>
       <xsl:when test="$dst_ports_d!=''">
         <xsl:value-of select="$dst_ports_d"/>
         <xsl:value-of select="substring($pad20,1,$pad20_len - string-length($dst_ports_d))"/>
-      </xsl:when> 
-    </xsl:choose>
-    <xsl:text>&newln;</xsl:text>
-  </xsl:if>
-
-
-  <xsl:if test="src_ports_apps!='' or dst_ports_apps!=''">
-    <xsl:variable name="src_ports_apps_d">
-      <xsl:call-template name="decode">
-        <xsl:with-param name="encoded" select="src_ports_apps"/>
-      </xsl:call-template>
-    </xsl:variable>
-
-    <xsl:variable name="dst_ports_apps_d">
-      <xsl:call-template name="decode">
-        <xsl:with-param name="encoded" select="dst_ports_apps"/>
-      </xsl:call-template>
-    </xsl:variable>
-
-    <xsl:value-of select="$pad6"/>
-    <xsl:value-of select="$pad6"/>
-    <xsl:value-of select="$pad6"/>
-    <xsl:value-of select="$pad11"/>
-    <xsl:value-of select="$pad11"/>
-
-    <xsl:choose>
-      <xsl:when test="$src_ports_apps_d=''">
-        <xsl:value-of select="$pad20"/>
-      </xsl:when> 
-      <xsl:when test="$src_ports_apps_d!=''">
-        <xsl:value-of select="$src_ports_apps_d"/>
-        <xsl:value-of select="substring($pad20,1,$pad20_len - string-length($src_ports_apps_d))"/>
-      </xsl:when> 
-    </xsl:choose>
-
-    <xsl:choose>
-      <xsl:when test="$dst_ports_apps_d!=''">
-        <xsl:value-of select="$dst_ports_apps_d"/>
-        <xsl:value-of select="substring($pad20,1,$pad20_len - string-length($dst_ports_apps_d))"/>
-      </xsl:when> 
-    </xsl:choose>
-    <xsl:text>&newln;</xsl:text>
-  </xsl:if>
-
-  <xsl:if test="src_port_start!='' or dst_port_start!=''">
-    <xsl:value-of select="$pad6"/>
-    <xsl:value-of select="$pad6"/>
-    <xsl:value-of select="$pad6"/>
-    <xsl:value-of select="$pad11"/>
-    <xsl:value-of select="$pad11"/>
-
-    <xsl:choose>
-      <xsl:when test="src_port_start=''">
-        <xsl:value-of select="$pad20"/>
-      </xsl:when> 
-      <xsl:when test="src_port_start!=''">
-        <xsl:value-of select="src_port_start"/>
-        <xsl:value-of select="substring($pad20,1,$pad20_len - string-length(src_port_start))"/>
-      </xsl:when> 
-    </xsl:choose>
-
-    <xsl:choose>
-      <xsl:when test="dst_port_start!=''">
-        <xsl:value-of select="dst_port_start"/>
-        <xsl:value-of select="substring($pad20,1,$pad20_len - string-length(dst_port_start))"/>
-      </xsl:when> 
-    </xsl:choose>
-    <xsl:text>&newln;</xsl:text>
-  </xsl:if>
-
-  <xsl:if test="src_port_stop!='' or dst_port_stop!=''">
-    <xsl:value-of select="$pad6"/>
-    <xsl:value-of select="$pad6"/>
-    <xsl:value-of select="$pad6"/>
-    <xsl:value-of select="$pad11"/>
-    <xsl:value-of select="$pad11"/>
-
-    <xsl:choose>
-      <xsl:when test="src_port_stop=''">
-        <xsl:value-of select="$pad20"/>
-      </xsl:when> 
-      <xsl:when test="src_port_stop!=''">
-        <xsl:value-of select="src_port_stop"/>
-        <xsl:value-of select="substring($pad20,1,$pad20_len - string-length(src_port_stop))"/>
-      </xsl:when> 
-    </xsl:choose>
-
-    <xsl:choose>
-      <xsl:when test="dst_port_stop!=''">
-        <xsl:value-of select="dst_port_stop"/>
-        <xsl:value-of select="substring($pad20,1,$pad20_len - string-length(dst_port_stop))"/>
       </xsl:when> 
     </xsl:choose>
     <xsl:text>&newln;</xsl:text>
