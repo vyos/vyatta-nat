@@ -4,6 +4,7 @@ use strict;
 use lib "/opt/vyatta/share/perl5/";
 use VyattaConfig;
 use VyattaMisc;
+use VyattaTypeChecker;
 
 my %fields = (
   _type	        => undef,
@@ -207,14 +208,20 @@ sub rule_str {
       $rule_str .= " -p $str";
     }
 
-    #my $to_src = " --to-source ";
-    my $to_src = "";
+    my $to_src = '';
     if (defined($self->{_outside_addr}->{_addr})) {
-      $to_src .= "$self->{_outside_addr}->{_addr}";
+      my $addr = $self->{_outside_addr}->{_addr};
+      return (undef, "\"$addr\" is not a valid IP address")
+        if (!VyattaTypeChecker::validateType('ipv4', $addr, 1));
+      $to_src .= $addr;
     } elsif (defined($self->{_outside_addr}->{_range}->{_start})
              && defined($self->{_outside_addr}->{_range}->{_stop})) {
-      $to_src .= "$self->{_outside_addr}->{_range}->{_start}";
-      $to_src .= "-$self->{_outside_addr}->{_range}->{_stop}";
+      my $start = $self->{_outside_addr}->{_range}->{_start};
+      my $stop = $self->{_outside_addr}->{_range}->{_stop};
+      return (undef, "\"$start-$stop\" is not a valid IP range")
+        if (!VyattaTypeChecker::validateType('ipv4', $start, 1)
+            || !VyattaTypeChecker::validateType('ipv4', $stop, 1));
+      $to_src .= "$start-$stop";
     }
    
     if (($to_src ne "") && ($self->{_type} eq "masquerade")) {
@@ -273,11 +280,18 @@ sub rule_str {
 
     my $to_dst = " --to-destination ";
     if (defined($self->{_inside_addr}->{_addr})) {
-      $to_dst .= "$self->{_inside_addr}->{_addr}";
+      my $addr = $self->{_inside_addr}->{_addr};
+      return (undef, "\"$addr\" is not a valid IP address")
+        if (!VyattaTypeChecker::validateType('ipv4', $addr, 1));
+      $to_dst .= $addr;
     } elsif (defined($self->{_inside_addr}->{_range}->{_start})
              && defined($self->{_inside_addr}->{_range}->{_stop})) {
-      $to_dst .= "$self->{_inside_addr}->{_range}->{_start}";
-      $to_dst .= "-$self->{_inside_addr}->{_range}->{_stop}";
+      my $start = $self->{_inside_addr}->{_range}->{_start};
+      my $stop = $self->{_inside_addr}->{_range}->{_stop};
+      return (undef, "\"$start-$stop\" is not a valid IP range")
+        if (!VyattaTypeChecker::validateType('ipv4', $start, 1)
+            || !VyattaTypeChecker::validateType('ipv4', $stop, 1));
+      $to_dst .= "$start-$stop";
     } 
     
     if (defined($self->{_inside_addr}->{_port})) {
@@ -321,20 +335,28 @@ sub rule_str {
 
   if (defined($self->{_source}->{_addr})) {
     my $str = $self->{_source}->{_addr};
+    return (undef, "\"$str\" is not a valid IP address")
+      if (!VyattaTypeChecker::validateType('ipv4_negate', $str, 1));
     $str =~ s/^\!(.*)$/! $1/;
     $rule_str .= " -s $str";
   } elsif (defined($self->{_source}->{_net})) {
     my $str = $self->{_source}->{_net};
+    return (undef, "\"$str\" is not a valid IP subnet")
+      if (!VyattaTypeChecker::validateType('ipv4net_negate', $str, 1));
     $str =~ s/^\!(.*)$/! $1/;
     $rule_str .= " -s $str";
   }
  
   if (defined($self->{_destination}->{_addr})) {
     my $str = $self->{_destination}->{_addr};
+    return (undef, "\"$str\" is not a valid IP address")
+      if (!VyattaTypeChecker::validateType('ipv4_negate', $str, 1));
     $str =~ s/^\!(.*)$/! $1/;
     $rule_str .= " -d $str";
   } elsif (defined($self->{_destination}->{_net})) {
     my $str = $self->{_destination}->{_net};
+    return (undef, "\"$str\" is not a valid IP subnet")
+      if (!VyattaTypeChecker::validateType('ipv4net_negate', $str, 1));
     $str =~ s/^\!(.*)$/! $1/;
     $rule_str .= " -d $str";
   }
