@@ -185,12 +185,9 @@
     <xsl:value-of select="$pad11"/>
 
     <xsl:choose>
-      <xsl:when test="$src_ports_d=''">
-        <xsl:value-of select="$pad20"/>
-      </xsl:when> 
       <xsl:when test="$src_ports_d!=''">
+        <xsl:text>src ports: </xsl:text>
         <xsl:value-of select="$src_ports_d"/>
-        <xsl:value-of select="substring($pad20,1,$pad20_len - string-length($src_ports_d))"/>
       </xsl:when> 
     </xsl:choose>
     <xsl:text>&newln;</xsl:text>
@@ -211,8 +208,8 @@
 
     <xsl:choose>
       <xsl:when test="$dst_ports_d!=''">
+        <xsl:text>dst ports: </xsl:text>
         <xsl:value-of select="$dst_ports_d"/>
-        <xsl:value-of select="substring($pad20,1,$pad20_len - string-length($dst_ports_d))"/>
       </xsl:when> 
     </xsl:choose>
     <xsl:text>&newln;</xsl:text>
