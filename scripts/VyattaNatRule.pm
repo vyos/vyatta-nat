@@ -5,6 +5,10 @@ use lib "/opt/vyatta/share/perl5/";
 use VyattaConfig;
 use VyattaMisc;
 use VyattaTypeChecker;
+use VyattaIpTablesAddressFilter;
+
+my $src = new VyattaIpTablesAddressFilter;
+my $dst = new VyattaIpTablesAddressFilter;
 
 my %fields = (
   _type	        => undef,
@@ -13,16 +17,6 @@ my %fields = (
   _outbound_if  => undef,
   _proto        => undef,
   _exclude      => undef,
-  _source       => {
-                    _addr       => undef,
-                    _net        => undef,
-                    _port       => undef,
-                   },
-  _destination  => {
-                    _addr       => undef,
-                    _net        => undef,
-                    _port       => undef,
-                   },
   _inside_addr  => {
                     _addr => undef,
                     _range  => {
@@ -65,24 +59,6 @@ sub setup {
   $self->{_proto} = $config->returnValue("protocol");
   $self->{_exclude} = $config->exists("exclude");
   
-  $self->{_source}->{_net} = undef;
-  $self->{_source}->{_addr} = $config->returnValue("source address");
-  if (defined($self->{_source}->{_addr})
-      && ($self->{_source}->{_addr} =~ /\//)) {
-    $self->{_source}->{_net} = $self->{_source}->{_addr};
-    $self->{_source}->{_addr} = undef;
-  }
-  $self->{_source}->{_port} = $config->returnValue("source port");
-
-  $self->{_destination}->{_net} = undef;
-  $self->{_destination}->{_addr} = $config->returnValue("destination address");
-  if (defined($self->{_destination}->{_addr})
-      && ($self->{_destination}->{_addr} =~ /\//)) {
-    $self->{_destination}->{_net} = $self->{_destination}->{_addr};
-    $self->{_destination}->{_addr} = undef;
-  }
-  $self->{_destination}->{_port} = $config->returnValue("destination port");
-  
   $self->{_inside_addr}->{_addr}
     = $config->returnValue("inside-address address");
   $self->{_inside_addr}->{_range}->{_start} = undef;
@@ -109,6 +85,9 @@ sub setup {
   $self->{_outside_addr}->{_port}
     = $config->returnValue("outside-address port");
 
+  $src->setup("$level source");
+  $dst->setup("$level destination");
+
   return 0;
 }
 
@@ -124,26 +103,6 @@ sub setupOrig {
   $self->{_outbound_if} = $config->returnOrigValue("outbound-interface");
   $self->{_proto} = $config->returnOrigValue("protocol");
   $self->{_exclude} = $config->existsOrig("exclude");
-  
-  $self->{_source}->{_net} = undef;
-  $self->{_source}->{_addr} = $config->returnOrigValue("source address");
-  if (defined($self->{_source}->{_addr})
-      && ($self->{_source}->{_addr} =~ /\//)) {
-    $self->{_source}->{_net} = $self->{_source}->{_addr};
-    $self->{_source}->{_addr} = undef;
-  }
-  $self->{_source}->{_port} = $config->returnOrigValue("source port");
-
-  $self->{_destination}->{_net} = undef;
-  $self->{_destination}->{_addr}
-    = $config->returnOrigValue("destination address");
-  if (defined($self->{_destination}->{_addr})
-      && ($self->{_destination}->{_addr} =~ /\//)) {
-    $self->{_destination}->{_net} = $self->{_destination}->{_addr};
-    $self->{_destination}->{_addr} = undef;
-  }
-  $self->{_destination}->{_port}
-    = $config->returnOrigValue("destination port");
   
   $self->{_inside_addr}->{_addr}
     = $config->returnOrigValue("inside-address address");
@@ -170,6 +129,9 @@ sub setupOrig {
   }
   $self->{_outside_addr}->{_port}
     = $config->returnOrigValue("outside-address port");
+
+  $src->setupOrig("$level source");
+  $dst->setupOrig("$level destination");
 
   return 0;
 }
@@ -319,49 +281,17 @@ sub rule_str {
     }
   }
 
-  # source port(s)
-  my ($port_str, $port_err)
-    = VyattaMisc::getPortRuleString($self->{_source}->{_port},
-                                    $can_use_port, "s", $self->{_proto});
-  return (undef, $port_err) if (!defined($port_str));
-  $rule_str .= $port_str;
+  # source rule string
+  my ($addr_str, $addr_err) = $src->rule();
+  return (undef, $addr_err) if (!defined($addr_str));
+  $rule_str .= " $addr_str";
   
-  # destination port(s)
-  ($port_str, $port_err)
-    = VyattaMisc::getPortRuleString($self->{_destination}->{_port},
-                                    $can_use_port, "d", $self->{_proto});
-  return (undef, $port_err) if (!defined($port_str));
-  $rule_str .= $port_str;
+  # destination rule string
+  ($addr_str, $addr_err) = $dst->rule();
+  return (undef, $addr_err) if (!defined($addr_str));
+  $rule_str .= " $addr_str";
 
-  if (defined($self->{_source}->{_addr})) {
-    my $str = $self->{_source}->{_addr};
-    return (undef, "\"$str\" is not a valid IP address")
-      if (!VyattaTypeChecker::validateType('ipv4_negate', $str, 1));
-    $str =~ s/^\!(.*)$/! $1/;
-    $rule_str .= " -s $str";
-  } elsif (defined($self->{_source}->{_net})) {
-    my $str = $self->{_source}->{_net};
-    return (undef, "\"$str\" is not a valid IP subnet")
-      if (!VyattaTypeChecker::validateType('ipv4net_negate', $str, 1));
-    $str =~ s/^\!(.*)$/! $1/;
-    $rule_str .= " -s $str";
-  }
- 
-  if (defined($self->{_destination}->{_addr})) {
-    my $str = $self->{_destination}->{_addr};
-    return (undef, "\"$str\" is not a valid IP address")
-      if (!VyattaTypeChecker::validateType('ipv4_negate', $str, 1));
-    $str =~ s/^\!(.*)$/! $1/;
-    $rule_str .= " -d $str";
-  } elsif (defined($self->{_destination}->{_net})) {
-    my $str = $self->{_destination}->{_net};
-    return (undef, "\"$str\" is not a valid IP subnet")
-      if (!VyattaTypeChecker::validateType('ipv4net_negate', $str, 1));
-    $str =~ s/^\!(.*)$/! $1/;
-    $rule_str .= " -d $str";
-  }
-
-  return ($rule_str, "");
+  return ($rule_str, undef);
 }
 
 sub orig_type {
@@ -381,11 +311,7 @@ sub print_str {
   my $str =
   "type[$self->{_type}] " .
   "in_if[$self->{_inbound_if}] out_if[$self->{_outbound_if}] " .
-  "proto[$self->{_proto}] saddr[$self->{_source}->{_addr}] ".
-  "snet[$self->{_source}->{_net}] sp[@{$self->{_source}->{_port}}] ".
-  "daddr[$self->{_destination}->{_addr}] " .
-  "dnet[$self->{_destination}->{_net}] " .
-  "dp[@{$self->{_destination}->{_port}}] " .
+  "proto[$self->{_proto}] " .
   "inaddr[$self->{_inside_addr}->{_addr}] " .
   "inrange[$self->{_inside_addr}->{_range}->{_start}-" .
   "$self->{_inside_addr}->{_range}->{_stop}] " .
@@ -394,7 +320,7 @@ sub print_str {
   "outrange[$self->{_outside_addr}->{_range}->{_start}-" .
   "$self->{_outside_addr}->{_range}->{_stop}]" .
   "outp[$self->{_outside_addr}->{_port}] ";
-
+  
   return $str;
 }
 
@@ -408,12 +334,6 @@ sub outputXml {
   outputXmlElem("type", $self->{_type}, $fh);
   outputXmlElem("in_interface", $self->{_inbound_if}, $fh);
   outputXmlElem("out_interface", $self->{_outbound_if}, $fh);
-  outputXmlElem("src_addr", $self->{_source}->{_addr}, $fh);
-  outputXmlElem("src_network", $self->{_source}->{_net}, $fh);
-  outputXmlElem("src_ports", $self->{_source}->{_port}, $fh);
-  outputXmlElem("dst_addr", $self->{_destination}->{_addr}, $fh);
-  outputXmlElem("dst_network", $self->{_destination}->{_net}, $fh);
-  outputXmlElem("dst_ports", $self->{_destination}->{_port}, $fh);
   outputXmlElem("in_addr", $self->{_inside_addr}->{_addr}, $fh);
   outputXmlElem("in_addr_start", $self->{_inside_addr}->{_range}->{_start},
                 $fh);
@@ -426,7 +346,9 @@ sub outputXml {
   outputXmlElem("out_addr_stop", $self->{_outside_addr}->{_range}->{_stop},
                 $fh);
   outputXmlElem("out_port", $self->{_outside_addr}->{_port}, $fh);
-  
+ 
+  $src->outputXml("src", $fh);
+  $dst->outputXml("dst", $fh);
   # no proto? ($self->{_proto})
 }
 

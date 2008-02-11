@@ -100,8 +100,8 @@
 
   <xsl:choose>
     <xsl:when test="src_addr=''">
-      <xsl:value-of select="src_network"/>
-      <xsl:value-of select="substring($pad20,1,$pad20_len - string-length(src_network))"/>
+      <xsl:value-of select="src_net"/>
+      <xsl:value-of select="substring($pad20,1,$pad20_len - string-length(src_net))"/>
     </xsl:when>
 
     <xsl:when test="src_addr!='0.0.0.0'">
@@ -110,15 +110,15 @@
     </xsl:when>
 
     <xsl:when test="src_addr='0.0.0.0'">
-      <xsl:value-of select="src_network"/>
-      <xsl:value-of select="substring($pad20,1,$pad20_len - string-length(src_network))"/>
+      <xsl:value-of select="src_net"/>
+      <xsl:value-of select="substring($pad20,1,$pad20_len - string-length(src_net))"/>
     </xsl:when>
   </xsl:choose>
 
   <xsl:choose>
     <xsl:when test="dst_addr=''">
-      <xsl:value-of select="dst_network"/>
-      <xsl:value-of select="substring($pad20,1,$pad20_len - string-length(dst_network))"/>
+      <xsl:value-of select="dst_net"/>
+      <xsl:value-of select="substring($pad20,1,$pad20_len - string-length(dst_net))"/>
     </xsl:when>
 
     <xsl:when test="dst_addr!='0.0.0.0'">
@@ -127,8 +127,8 @@
     </xsl:when>
 
     <xsl:when test="dst_addr='0.0.0.0'">
-      <xsl:value-of select="dst_network"/>
-      <xsl:value-of select="substring($pad20,1,$pad20_len - string-length(dst_network))"/>
+      <xsl:value-of select="dst_net"/>
+      <xsl:value-of select="substring($pad20,1,$pad20_len - string-length(dst_net))"/>
     </xsl:when>
   </xsl:choose>
 
