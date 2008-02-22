@@ -10,6 +10,11 @@ sub numerically { $a <=> $b; }
 exit 1 if ($#ARGV != 0);
 my $xsl_file = $ARGV[0];
 
+if (! -e $xsl_file) {
+  print "Invalid XSL file \"$xsl_file\"\n";
+  exit 1;
+}
+
 my %stats = (
               source      => [ ],
               destination => [ ],
