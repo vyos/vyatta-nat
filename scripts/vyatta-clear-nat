@@ -1,0 +1,4 @@
+#!/bin/sh
+
+iptables-save -t nat | iptables-restore
+

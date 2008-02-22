@@ -24,12 +24,6 @@ sub raw_cleanup {
   }
 }
 
-# for "clear nat translations"
-if ($ARGV[0] eq "clearnattranslations") {
-  system("iptables-save -t nat | iptables-restore");
-  exit 0;
-}
-
 my $config = new VyattaConfig;
 $config->setLevel("service nat rule");
 my %rules = $config->listNodeStatus();
