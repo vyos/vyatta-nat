@@ -1,3 +1,30 @@
+vyatta-nat (0.2) unstable; urgency=low
+
+  vc4.0.0
+  [ Mark O'Brien ]
+
+
+  [ An-Cheng Huang ]
+  * convert templates to new syntax
+  * fix for bug 2591: update help text
+  * fix for bug 2590: "protocols" -> "protocol"
+  * fix for bug 2528: collapse source/destination "address" and
+    "network".
+  * fix for bug 2791: merge port configuration options.
+  * move common function to vyatta-cfg
+  * merge ports in show output
+  * make show output consistent with firewall
+  * merge address range into address
+  * add address validation
+  * use common implementation of source/destination handling for NAT and
+    firewall.
+  * add error checking for show command
+  * fix clear commands for operator level
+
+  [ Mark O'Brien ]
+
+ -- Mark O'Brien <mobrien@vyatta.com>  Mon, 25 Feb 2008 17:39:08 -0800
+
 vyatta-nat (0.1) unstable; urgency=low
 
   * Initial Release.
