@@ -31,7 +31,7 @@ while (<STATS>) {
   }
 
   if ($skey ne "" && (m/SNAT/ || m/DNAT/ || m/MASQUERADE/ || m/RETURN/)) {
-    m/^\s*(\d+)\s+(\d+)\s/;
+    m/^\s*(\d+[KMG]?)\s+(\d+[KMG]?)\s/;
     push @{$stats{$skey}}, ($1, $2);
   }
 }
