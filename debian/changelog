@@ -1,3 +1,22 @@
+vyatta-nat (0.3) unstable; urgency=low
+
+  3.0.1
+  [ Mark O'Brien ]
+
+
+  [ An-Cheng Huang ]
+  * fix for bug 2963: handle "KMG" counter representations.
+  * fix for bug 2975: add sudo for "iptables -L"
+
+  [ Stephen Hemminger ]
+  * fix non-root iptables usage in nat
+  * Replace VPL with GPLv2
+  * Update from VPL1.0 to GPLv2
+
+  [ Mark O'Brien ]
+
+ -- Mark O'Brien <mobrien@vyatta.com>  Tue, 18 Mar 2008 19:04:37 -0700
+
 vyatta-nat (0.2) unstable; urgency=low
 
   vc4.0.0
