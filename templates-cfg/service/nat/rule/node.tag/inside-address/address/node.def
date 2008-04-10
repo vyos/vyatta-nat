@@ -1,5 +1,5 @@
 type: txt
-help: Configure inside IP address or range for NAT
+help: Set inside IP address or range for NAT
 comp_help: Possible completions:
-  <IP address>                  NAT to the specified IP address
-  <IP address>-<IP address>     NAT to the specified IP range
+  <x.x.x.x>                  NAT to the specified IP address
+  <x.x.x.x>-<x.x.x.x>        NAT to the specified IP range
