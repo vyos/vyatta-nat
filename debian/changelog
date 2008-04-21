@@ -7,7 +7,7 @@ vyatta-nat (0.6) unstable; urgency=low
 
 vyatta-nat (0.5) unstable; urgency=low
 
-  VC4.0.2
+  VC4.0.2 release candidate
 
 
  -- Mark O'Brien <mobrien@vyatta.com>  Wed, 16 Apr 2008 09:50:15 -0700
