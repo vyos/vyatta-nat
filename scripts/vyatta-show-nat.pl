@@ -19,7 +19,7 @@ my %stats = (
               source      => [ ],
               destination => [ ],
             );
-open(STATS, "/sbin/iptables -t nat -L -vn |") or exit 1;
+open(STATS, "sudo /sbin/iptables -t nat -L -vn |") or exit 1;
 my $skey = "";
 while (<STATS>) {
   if (m/^Chain PREROUTING/) {
@@ -31,7 +31,7 @@ while (<STATS>) {
   }
 
   if ($skey ne "" && (m/SNAT/ || m/DNAT/ || m/MASQUERADE/ || m/RETURN/)) {
-    m/^\s*(\d+)\s+(\d+)\s/;
+    m/^\s*(\d+[KMG]?)\s+(\d+[KMG]?)\s/;
     push @{$stats{$skey}}, ($1, $2);
   }
 }
