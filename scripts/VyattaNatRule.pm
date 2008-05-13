@@ -288,14 +288,20 @@ sub rule_str {
   }
 
   # source rule string
-  my ($addr_str, $addr_err) = $src->rule();
-  return (undef, $addr_err) if (!defined($addr_str));
-  $rule_str .= " $addr_str";
+  my ($src_str, $src_err) = $src->rule();
+  return (undef, $src_err) if (!defined($src_str));
   
   # destination rule string
-  ($addr_str, $addr_err) = $dst->rule();
-  return (undef, $addr_err) if (!defined($addr_str));
-  $rule_str .= " $addr_str";
+  my ($dst_str, $dst_err) = $dst->rule();
+  return (undef, $dst_err) if (!defined($dst_str));
+
+  if ((grep /multiport/, $src_str) || (grep /multiport/, $dst_str)) {
+    if ((grep /sport/, $src_str) && (grep /dport/, $dst_str)) {
+      return (undef, 'cannot specify multiple ports when both '
+                     . 'source and destination ports are specified');
+    }
+  }
+  $rule_str .= " $src_str $dst_str";
 
   return ($rule_str, undef);
 }
