@@ -220,7 +220,7 @@ sub rule_str {
     } elsif ($self->{_type} ne "masquerade") {
       return (undef, "outside-address not specified");
     }
-  } else {
+  } elsif ($self->{_type} eq "destination") {
     # type is destination
     if ($self->{_exclude}) {
       $rule_str .= "-j RETURN";
@@ -279,6 +279,8 @@ sub rule_str {
     } else {
       return (undef, "inside-address not specified");
     }
+  } else {
+    return (undef, "rule type not specified/valid");
   }
 
   # source rule string

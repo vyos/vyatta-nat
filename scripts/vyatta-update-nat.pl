@@ -108,8 +108,8 @@ for $rule (@rule_keys) {
   my ($str, $err) = $nrule->rule_str();
   if (!defined($str)) {
     # rule check failed => return error
-    print OUT "ERROR: $err\n";
-    print STDERR "ERROR: $err\n";
+    print OUT "NAT configuration error: $err\n";
+    print STDERR "NAT configuration error: $err\n";
     exit 5;
   }
   
