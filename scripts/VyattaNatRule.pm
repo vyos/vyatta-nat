@@ -211,7 +211,9 @@ sub rule_str {
       $to_src .= "$self->{_outside_addr}->{_port}";
     }
     
-    if ($to_src ne "") {
+    if ($self->{_exclude}) {
+      # outside-address has no effect for "exclude" rules
+    } elsif ($to_src ne '') {
       if ($self->{_type} eq "masquerade") {
         $rule_str .= " --to-ports $to_src";
       } else {
@@ -274,7 +276,9 @@ sub rule_str {
       $to_dst .= ":$self->{_inside_addr}->{_port}";
     }
     
-    if ($to_dst ne " --to-destination ") {
+    if ($self->{_exclude}) {
+      # inside-address has no effect for "exclude" rules
+    } elsif ($to_dst ne ' --to-destination ') {
       $rule_str .= $to_dst;
     } else {
       return (undef, "inside-address not specified");
