@@ -11,6 +11,7 @@
 /configure
 /debian/files
 /debian/vyatta-nat
+/debian/vyatta-nat.debhelper.log
 /INSTALL
 /Makefile.in
 /Makefile
