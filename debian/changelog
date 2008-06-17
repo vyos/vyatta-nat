@@ -1,3 +1,29 @@
+vyatta-nat (0.10) unstable; urgency=low
+
+	  3.1.0
+  [ Mark O'Brien ]
+
+
+  [ rbalocca ]
+  * Ignore derived files
+
+  [ An-Cheng Huang ]
+  * fix for bug 3249: disallow multiport if both source and destination
+    ports
+  * fix for bug 3248: "exclude" now works with "source" and
+    "destination" types.
+  * fix for bug 3246: show error message when NAT rule has no "type".
+
+  [ rbalocca ]
+  * Convert to our method of changelog creation
+
+  [ Mohit Mehta ]
+  * Fix Bug 3069 Help strings should be standardized
+
+  [ Mark O'Brien ]
+
+ -- Mark O'Brien <mobrien@firebolt.vyatta.com>  Tue, 17 Jun 2008 09:27:00 -0700
+
 vyatta-nat (0.9) unstable; urgency=low
 
   3.0.5
