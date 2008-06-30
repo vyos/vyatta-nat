@@ -211,7 +211,9 @@ sub rule_str {
       $to_src .= "$self->{_outside_addr}->{_port}";
     }
     
-    if ($to_src ne "") {
+    if ($self->{_exclude}) {
+      # outside-address has no effect for "exclude" rules
+    } elsif ($to_src ne '') {
       if ($self->{_type} eq "masquerade") {
         $rule_str .= " --to-ports $to_src";
       } else {
@@ -220,7 +222,7 @@ sub rule_str {
     } elsif ($self->{_type} ne "masquerade") {
       return (undef, "outside-address not specified");
     }
-  } else {
+  } elsif ($self->{_type} eq "destination") {
     # type is destination
     if ($self->{_exclude}) {
       $rule_str .= "-j RETURN";
@@ -274,22 +276,32 @@ sub rule_str {
       $to_dst .= ":$self->{_inside_addr}->{_port}";
     }
     
-    if ($to_dst ne " --to-destination ") {
+    if ($self->{_exclude}) {
+      # inside-address has no effect for "exclude" rules
+    } elsif ($to_dst ne ' --to-destination ') {
       $rule_str .= $to_dst;
     } else {
       return (undef, "inside-address not specified");
     }
+  } else {
+    return (undef, "rule type not specified/valid");
   }
 
   # source rule string
-  my ($addr_str, $addr_err) = $src->rule();
-  return (undef, $addr_err) if (!defined($addr_str));
-  $rule_str .= " $addr_str";
+  my ($src_str, $src_err) = $src->rule();
+  return (undef, $src_err) if (!defined($src_str));
   
   # destination rule string
-  ($addr_str, $addr_err) = $dst->rule();
-  return (undef, $addr_err) if (!defined($addr_str));
-  $rule_str .= " $addr_str";
+  my ($dst_str, $dst_err) = $dst->rule();
+  return (undef, $dst_err) if (!defined($dst_str));
+
+  if ((grep /multiport/, $src_str) || (grep /multiport/, $dst_str)) {
+    if ((grep /sport/, $src_str) && (grep /dport/, $dst_str)) {
+      return (undef, 'cannot specify multiple ports when both '
+                     . 'source and destination ports are specified');
+    }
+  }
+  $rule_str .= " $src_str $dst_str";
 
   return ($rule_str, undef);
 }

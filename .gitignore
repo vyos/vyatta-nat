@@ -3,7 +3,6 @@
 /aclocal.m4
 /autom4te.cache
 /build-stamp
-/ChangeLog
 /config
 /config.log
 /config.guess
@@ -12,6 +11,7 @@
 /configure
 /debian/files
 /debian/vyatta-nat
+/debian/vyatta-nat.debhelper.log
 /INSTALL
 /Makefile.in
 /Makefile
