@@ -189,6 +189,19 @@ if  (! -f $conntrack) {
 my $xs = XML::Simple->new(ForceArray => 1, KeepRoot => 0);
 my ($xml, $data);
 
+if (defined $verbose) {
+    printf($verbose_format, 'Pre-NAT src', 'Pre-NAT dst', 
+	   'Post-NAT src', 'Post-NAT dst');
+} else {
+    printf($format, 'Pre-NAT', 'Post-NAT', 'Type', 'Prot', 'Timeout');
+    if (defined $pipe) {
+	# flush stdout after every write
+	$| = 1;
+	print " Type";
+    }
+    print "\n";
+}
+
 if (defined $xml_file) {
     $xml = read_xml_file($xml_file);
     $data = $xs->XMLin($xml);
@@ -196,38 +209,19 @@ if (defined $xml_file) {
 	print_xml($data);
 	exit;
     }
-    if (defined $verbose) {
-	printf($verbose_format, 'Inside src', 'Inside dst', 
-	       'Outside src', 'Outside dst');
-    } else {
-	printf($format, 'Pre-NAT', 'Post-NAT', 'Type', 'Prot', 'Timeout');
-	print "\n";
-    }
     nat_print_xml($data, 'snat');
 
 } elsif (defined $pipe) {
-    # flush stdout after every write
-    $| = 1;
-    printf($format, 'Pre-NAT', 'Post-NAT', 'Type', 'Prot', 'Timeout');
-    print " Type\n";
     while ($xml = <STDIN>) {
 	$xml = add_xml_root($xml);
 	$data = $xs->XMLin($xml);
 	nat_print_xml($data, $mode);
     }
 } else {
-
     if (defined $proto) {
 	$proto = "-p $proto" 
     } else {
 	$proto = "";
-    }
-    if (defined $verbose) {
-	printf($verbose_format, 'Inside src', 'Inside dst', 
-	       'Outside src', 'Outside dst');
-    } else {
-	printf($format, 'Pre-NAT', 'Post-NAT', 'Type', 'Prot', 'Timeout');
-	print "\n";
     }
     if ($mode eq 'both' or $mode eq 'snat') {
 	my $ipopt = "";
