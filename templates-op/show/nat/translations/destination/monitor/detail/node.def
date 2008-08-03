@@ -1,0 +1,3 @@
+help: Show active NAT destination translations events detail
+run: echo Type control-C to quit 
+     sudo /usr/sbin/conntrack -E -g -o xml | ${vyatta_bindir}/sudo-users/vyatta-nat-translations.pl --mode=dnat --pipe --verbose | ${VYATTA_PAGER:-cat}

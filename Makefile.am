@@ -8,7 +8,8 @@ curverdir = $(sysconfdir)/config-migrate/current
 sbin_SCRIPTS = scripts/vyatta-update-nat.pl
 sbin_SCRIPTS += scripts/vyatta-show-nat.pl
 
-bin_sudo_users_SCRIPTS = scripts/vyatta-clear-nat
+bin_sudo_users_SCRIPTS  = scripts/vyatta-clear-nat
+bin_sudo_users_SCRIPTS += scripts/vyatta-nat-translations.pl
 
 share_perl5_DATA = scripts/VyattaNatRule.pm
 curver_DATA = cfg-version/nat@2
