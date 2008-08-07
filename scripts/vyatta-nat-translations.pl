@@ -189,16 +189,15 @@ if  (! -f $conntrack) {
 my $xs = XML::Simple->new(ForceArray => 1, KeepRoot => 0);
 my ($xml, $data);
 
+# flush stdout after every write for pipe mode
+$! = 1 if defined $pipe; 
+
 if (defined $verbose) {
     printf($verbose_format, 'Pre-NAT src', 'Pre-NAT dst', 
 	   'Post-NAT src', 'Post-NAT dst');
 } else {
     printf($format, 'Pre-NAT', 'Post-NAT', 'Type', 'Prot', 'Timeout');
-    if (defined $pipe) {
-	# flush stdout after every write
-	$| = 1;
-	print " Type";
-    }
+    print " Type" if defined $pipe;
     print "\n";
 }
 
