@@ -190,7 +190,7 @@ my $xs = XML::Simple->new(ForceArray => 1, KeepRoot => 0);
 my ($xml, $data);
 
 # flush stdout after every write for pipe mode
-$! = 1 if defined $pipe; 
+$| = 1 if defined $pipe; 
 
 if (defined $verbose) {
     printf($verbose_format, 'Pre-NAT src', 'Pre-NAT dst', 
