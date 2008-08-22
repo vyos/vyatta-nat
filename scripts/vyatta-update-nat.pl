@@ -22,6 +22,9 @@ sub raw_cleanup {
       last;
     }
   }
+  
+  system('iptables -t nat -A VYATTA_PRE_SNAT_HOOK -j RETURN');
+  system('iptables -t nat -A POSTROUTING -j VYATTA_PRE_SNAT_HOOK');
 }
 
 my $config = new VyattaConfig;
@@ -30,8 +33,8 @@ my %rules = $config->listNodeStatus();
 my $rule;
 open(OUT, ">>/dev/null") or exit 1;
 my %ipt_rulenum = (
-                    source      => 1,
-                    destination => 1,
+                    source      => 2,
+                    destination => 2,
                   );
 my %chain_name = (
                   source      => "POSTROUTING",
@@ -150,6 +153,7 @@ for $rule (@rule_keys) {
 }
 
 if ($all_deleted) {
+  system('iptables -t nat -F');
   raw_cleanup();
 }
 
