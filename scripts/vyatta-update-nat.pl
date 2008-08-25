@@ -34,7 +34,7 @@ my $rule;
 open(OUT, ">>/dev/null") or exit 1;
 my %ipt_rulenum = (
                     source      => 2,
-                    destination => 2,
+                    destination => 1,
                   );
 my %chain_name = (
                   source      => "POSTROUTING",
