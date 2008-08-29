@@ -22,9 +22,6 @@ sub raw_cleanup {
       last;
     }
   }
-  
-  system('iptables -t nat -A VYATTA_PRE_SNAT_HOOK -j RETURN');
-  system('iptables -t nat -A POSTROUTING -j VYATTA_PRE_SNAT_HOOK');
 }
 
 my $config = new VyattaConfig;
@@ -43,12 +40,6 @@ my %chain_name = (
 print OUT "========= nat list =========\n";
 my @rule_keys = sort numerically keys %rules;
 if ($#rule_keys < 0) {
-  # no rules (everything is deleted) => flush the nat table & return
-  print OUT "iptables -t nat -F\n";
-  if (system("iptables -t nat -F")) {
-    exit 1;
-  }
-  
   raw_cleanup();
  
   exit 0;
@@ -153,7 +144,6 @@ for $rule (@rule_keys) {
 }
 
 if ($all_deleted) {
-  system('iptables -t nat -F');
   raw_cleanup();
 }
 
