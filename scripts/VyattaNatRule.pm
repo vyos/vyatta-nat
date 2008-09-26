@@ -186,6 +186,9 @@ sub rule_str {
       $to_src .= "$start-$stop";
     }
    
+    return (undef, 'cannot specify inbound interface with "masquerade"')
+      if (defined($self->{_inbound_if}) && ($self->{_type} eq "masquerade"));
+
     if (($to_src ne "") && ($self->{_type} eq "masquerade")) {
       return (undef, "cannot specify outside IP address with \"masquerade\"");
     }
