@@ -30,7 +30,7 @@ my %rules = $config->listNodeStatus();
 my $rule;
 open(OUT, ">>/dev/null") or exit 1;
 my %ipt_rulenum = (
-                    source      => 1,
+                    source      => 2,
                     destination => 1,
                   );
 my %chain_name = (
@@ -40,12 +40,6 @@ my %chain_name = (
 print OUT "========= nat list =========\n";
 my @rule_keys = sort numerically keys %rules;
 if ($#rule_keys < 0) {
-  # no rules (everything is deleted) => flush the nat table & return
-  print OUT "iptables -t nat -F\n";
-  if (system("iptables -t nat -F")) {
-    exit 1;
-  }
-  
   raw_cleanup();
  
   exit 0;
