@@ -42,6 +42,9 @@ open(RENDER, "| /opt/vyatta/sbin/render_xml $xsl_file") or exit 1;
 # begin
 print RENDER "<opcommand name='natrules'><format type='row'>\n";
 
+# get rid of the stats for PRE_SNAT_HOOK
+splice @{$stats{'source'}}, 0, 2;
+
 my $config = new VyattaConfig;
 $config->setLevel("service nat rule");
 my @rules_pre = $config->listOrigNodes();
