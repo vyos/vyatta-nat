@@ -48,9 +48,9 @@
 <xsl:text>&newln;</xsl:text>
 <xsl:text>Type Codes:  SRC - source, DST - destination, MASQ - masquerade&newln;</xsl:text>
 <xsl:text>&newln;</xsl:text>
-<xsl:text>rule  packets   bytes     type     IN         OUT</xsl:text>
+<xsl:text>rule  count     type     IN         OUT</xsl:text>
 <xsl:text>&newln;</xsl:text>
-<xsl:text>----  -------   -----     ----  ---------  ---------</xsl:text>
+<xsl:text>----  -------   ----  ---------  ---------</xsl:text>
 <xsl:text>&newln;</xsl:text>
 
 <xsl:for-each select="format/row">
@@ -60,9 +60,6 @@
   
 <xsl:value-of select="pkts"/>
 <xsl:value-of select="substring($pad10,1,$pad10_len - string-length(pkts))"/>
-
-<xsl:value-of select="bytes"/>
-<xsl:value-of select="substring($pad10,1,$pad10_len - string-length(bytes))"/>
 
   <xsl:choose>
     <xsl:when test="type='source'">
