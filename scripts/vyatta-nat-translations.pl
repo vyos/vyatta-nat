@@ -33,7 +33,7 @@ use strict;
 
 my $dump = 0;
 my ($xml_file, $verbose, $proto, $stats, $ipaddr, $pipe);
-my $mode='both';
+my $mode;
 my $verbose_format = "%-20s %-18s %-20s %-18s\n";
 my $format         = "%-20s %-20s %-4s  %-4s  %-8s";
 
@@ -59,6 +59,18 @@ sub read_xml_file {
 sub print_xml {
     my $data = shift;
     print Dumper($data); 
+}
+
+sub guess_snat_dnat {
+    my ($src, $dst) = @_;
+
+    if ($src->{original} eq $dst->{reply}) {
+	return "dnat";
+    }
+    if ($dst->{original} eq $src->{reply}) {
+	return "snat";
+    }
+    return "unkn";
 }
 
 sub nat_print_xml {
@@ -115,6 +127,9 @@ sub nat_print_xml {
 	$out_dst .= ":$sport{reply}" if defined $sport{reply};
 	if (defined $verbose) {
 	    printf($verbose_format, $in_src, $in_dst, $out_src, $out_dst);
+	}
+	if (! defined $mode) {
+	    $mode = guess_snat_dnat(\%src, \%dst);
 	}
 	if (defined $mode) {
 	    my ($from, $to);
@@ -222,6 +237,7 @@ if (defined $xml_file) {
     } else {
 	$proto = "";
     }
+    $mode = 'both' if ! defined $mode;
     if ($mode eq 'both' or $mode eq 'snat') {
 	my $ipopt = "";
 	if (defined $ipaddr) {
