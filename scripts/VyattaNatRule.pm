@@ -148,6 +148,10 @@ sub rule_str {
     $can_use_port = 0;
   }
   if (($self->{_type} eq "source") || ($self->{_type} eq "masquerade")) {
+    return (undef, 'cannot specify inbound interface with '
+                   . '"masquerade" or "source" rules')
+      if (defined($self->{_inbound_if}));
+
     if ($self->{_exclude}) {
       $rule_str .= "-j RETURN";
     } elsif ($self->{_type} eq "masquerade") {
@@ -186,9 +190,6 @@ sub rule_str {
       $to_src .= "$start-$stop";
     }
    
-    return (undef, 'cannot specify inbound interface with "masquerade"')
-      if (defined($self->{_inbound_if}) && ($self->{_type} eq "masquerade"));
-
     if (($to_src ne "") && ($self->{_type} eq "masquerade")) {
       return (undef, "cannot specify outside IP address with \"masquerade\"");
     }
@@ -227,6 +228,10 @@ sub rule_str {
     }
   } elsif ($self->{_type} eq "destination") {
     # type is destination
+    return (undef,
+            'cannot specify outbound interface with "destination" rules')
+      if (defined($self->{_outbound_if}));
+
     if ($self->{_exclude}) {
       $rule_str .= "-j RETURN";
     } else {
