@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
 use strict;
-use lib "/opt/vyatta/share/perl5/";
+use lib "/opt/vyatta/share/perl5";
 use VyattaConfig;
-use VyattaNatRule;
+use Vyatta::NatRule;
 
 sub numerically { $a <=> $b; }
 

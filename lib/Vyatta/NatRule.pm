@@ -1,11 +1,11 @@
-package VyattaNatRule;
+package Vyatta::NatRule;
 
 use strict;
-use lib "/opt/vyatta/share/perl5/";
-use VyattaConfig;
+use lib "/opt/vyatta/share/perl5";
+require VyattaConfig;
+require Vyatta::IpTablesAddressFilter;
 use VyattaMisc;
 use VyattaTypeChecker;
-use VyattaIpTablesAddressFilter;
 
 my $src = new VyattaIpTablesAddressFilter;
 my $dst = new VyattaIpTablesAddressFilter;
