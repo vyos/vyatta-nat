@@ -4,8 +4,8 @@ use strict;
 use lib "/opt/vyatta/share/perl5";
 require VyattaConfig;
 require Vyatta::IpTablesAddressFilter;
-use VyattaMisc;
-use VyattaTypeChecker;
+use Vyatta::Misc;
+use Vyatta::TypeChecker;
 
 my $src = new VyattaIpTablesAddressFilter;
 my $dst = new VyattaIpTablesAddressFilter;
@@ -178,15 +178,15 @@ sub rule_str {
     if (defined($self->{_outside_addr}->{_addr})) {
       my $addr = $self->{_outside_addr}->{_addr};
       return (undef, "\"$addr\" is not a valid IP address")
-        if (!VyattaTypeChecker::validateType('ipv4', $addr, 1));
+        if (!Vyatta::TypeChecker::validateType('ipv4', $addr, 1));
       $to_src .= $addr;
     } elsif (defined($self->{_outside_addr}->{_range}->{_start})
              && defined($self->{_outside_addr}->{_range}->{_stop})) {
       my $start = $self->{_outside_addr}->{_range}->{_start};
       my $stop = $self->{_outside_addr}->{_range}->{_stop};
       return (undef, "\"$start-$stop\" is not a valid IP range")
-        if (!VyattaTypeChecker::validateType('ipv4', $start, 1)
-            || !VyattaTypeChecker::validateType('ipv4', $stop, 1));
+        if (!Vyatta::TypeChecker::validateType('ipv4', $start, 1)
+            || !Vyatta::TypeChecker::validateType('ipv4', $stop, 1));
       $to_src .= "$start-$stop";
     }
    
@@ -205,11 +205,11 @@ sub rule_str {
       my ($success, $err) = (undef, undef);
       if ($self->{_outside_addr}->{_port} =~ /-/) {
         ($success, $err)
-          = VyattaMisc::isValidPortRange($self->{_outside_addr}->{_port}, '-');
+          = Vyatta::Misc::isValidPortRange($self->{_outside_addr}->{_port}, '-');
         return (undef, $err) if (!defined($success));
       } else {
         ($success, $err)
-          = VyattaMisc::isValidPortNumber($self->{_outside_addr}->{_port});
+          = Vyatta::Misc::isValidPortNumber($self->{_outside_addr}->{_port});
         return (undef, $err) if (!defined($success));
       }
       $to_src .= "$self->{_outside_addr}->{_port}";
@@ -254,15 +254,15 @@ sub rule_str {
     if (defined($self->{_inside_addr}->{_addr})) {
       my $addr = $self->{_inside_addr}->{_addr};
       return (undef, "\"$addr\" is not a valid IP address")
-        if (!VyattaTypeChecker::validateType('ipv4', $addr, 1));
+        if (!Vyatta::TypeChecker::validateType('ipv4', $addr, 1));
       $to_dst .= $addr;
     } elsif (defined($self->{_inside_addr}->{_range}->{_start})
              && defined($self->{_inside_addr}->{_range}->{_stop})) {
       my $start = $self->{_inside_addr}->{_range}->{_start};
       my $stop = $self->{_inside_addr}->{_range}->{_stop};
       return (undef, "\"$start-$stop\" is not a valid IP range")
-        if (!VyattaTypeChecker::validateType('ipv4', $start, 1)
-            || !VyattaTypeChecker::validateType('ipv4', $stop, 1));
+        if (!Vyatta::TypeChecker::validateType('ipv4', $start, 1)
+            || !Vyatta::TypeChecker::validateType('ipv4', $stop, 1));
       $to_dst .= "$start-$stop";
     } 
     
@@ -274,11 +274,11 @@ sub rule_str {
       my ($success, $err) = (undef, undef);
       if ($self->{_inside_addr}->{_port} =~ /-/) {
         ($success, $err)
-          = VyattaMisc::isValidPortRange($self->{_inside_addr}->{_port}, '-');
+          = Vyatta::Misc::isValidPortRange($self->{_inside_addr}->{_port}, '-');
         return (undef, $err) if (!defined($success));
       } else {
         ($success, $err)
-          = VyattaMisc::isValidPortNumber($self->{_inside_addr}->{_port});
+          = Vyatta::Misc::isValidPortNumber($self->{_inside_addr}->{_port});
         return (undef, $err) if (!defined($success));
       }
       $to_dst .= ":$self->{_inside_addr}->{_port}";

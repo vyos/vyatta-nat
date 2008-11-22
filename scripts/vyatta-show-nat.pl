@@ -2,7 +2,7 @@
 
 use strict;
 use lib "/opt/vyatta/share/perl5";
-use VyattaConfig;
+use Vyatta::Config;
 use Vyatta::NatRule;
 
 sub numerically { $a <=> $b; }
@@ -45,7 +45,7 @@ print RENDER "<opcommand name='natrules'><format type='row'>\n";
 # get rid of the stats for PRE_SNAT_HOOK
 splice @{$stats{'source'}}, 0, 2;
 
-my $config = new VyattaConfig;
+my $config = new Vyatta::Config;
 $config->setLevel("service nat rule");
 my @rules_pre = $config->listOrigNodes();
 my $rule;

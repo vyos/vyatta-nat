@@ -2,7 +2,7 @@
 
 use strict;
 use lib "/opt/vyatta/share/perl5/";
-use VyattaConfig;
+use Vyatta::Config;
 use Vyatta::NatRule;
 
 sub numerically { $a <=> $b; }
@@ -24,7 +24,7 @@ sub raw_cleanup {
   }
 }
 
-my $config = new VyattaConfig;
+my $config = new Vyatta::Config;
 $config->setLevel("service nat rule");
 my %rules = $config->listNodeStatus();
 my $rule;
