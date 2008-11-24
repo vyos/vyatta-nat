@@ -2,7 +2,7 @@ package Vyatta::NatRule;
 
 use strict;
 use lib "/opt/vyatta/share/perl5";
-require VyattaConfig;
+require Vyatta::Config;
 require Vyatta::IpTablesAddressFilter;
 use Vyatta::Misc;
 use Vyatta::TypeChecker;
@@ -48,7 +48,7 @@ sub new {
 
 sub setup {
   my ( $self, $level ) = @_;
-  my $config = new VyattaConfig;
+  my $config = new Vyatta::Config;
 
   $config->setLevel("$level");
 
@@ -93,7 +93,7 @@ sub setup {
 
 sub setupOrig {
   my ( $self, $level ) = @_;
-  my $config = new VyattaConfig;
+  my $config = new Vyatta::Config;
 
   $config->setLevel("$level");
 
