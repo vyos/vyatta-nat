@@ -65,7 +65,7 @@ if ($? >> 8) {
 my $all_deleted = 1;
 for $rule (@rule_keys) {
   print OUT "$rule: $rules{$rule}\n";
-  my $nrule = new VyattaNatRule;
+  my $nrule = new Vyatta::NatRule;
   $nrule->setup("service nat rule $rule");
   my $otype = $nrule->orig_type();
   my $ntype = $nrule->new_type();

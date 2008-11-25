@@ -51,7 +51,7 @@ my @rules_pre = $config->listOrigNodes();
 my $rule;
 my @rules = sort numerically @rules_pre;
 for $rule (@rules) {
-  my $nrule = new VyattaNatRule;
+  my $nrule = new Vyatta::NatRule;
   $nrule->setupOrig("service nat rule $rule");
   my $ntype = $nrule->orig_type(); 
   print RENDER "  <row>\n";
