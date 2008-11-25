@@ -3,12 +3,12 @@ package Vyatta::NatRule;
 use strict;
 use lib "/opt/vyatta/share/perl5";
 require Vyatta::Config;
-require Vyatta::IpTablesAddressFilter;
+require Vyatta::IpTables::AddressFilter;
 use Vyatta::Misc;
 use Vyatta::TypeChecker;
 
-my $src = new VyattaIpTablesAddressFilter;
-my $dst = new VyattaIpTablesAddressFilter;
+my $src = new Vyatta::IpTables::AddressFilter;
+my $dst = new Vyatta::IpTables::AddressFilter;
 
 my %fields = (
   _type	        => undef,
