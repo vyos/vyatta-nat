@@ -2,3 +2,15 @@ type:  txt
 help: Set outbound interface for NAT traffic
 allowed: ls /sys/class/net 2>/dev/null
 comp_help:Enter a network interface name, for example, "eth0"
+commit:expression: exec "
+        intf_array=($(awk '$1 ~ /:/ { print $1 }' /proc/net/dev))
+        intf_array_len=${#intf_array[*]}
+        i=0
+        while [ $i -lt $intf_array_len ]; do
+             temp=${intf_array[$i]%:*}
+             if [ \"$temp\" == \"$VAR(@)\" ] ; then
+                   exit 0
+             fi
+             let i++
+        done
+        echo NAT configuration warning: interface $VAR(@) does not exist on this system "
