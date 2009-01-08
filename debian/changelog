@@ -1,3 +1,26 @@
+vyatta-nat (0.12.1) unstable; urgency=low
+
+  [ An-Cheng Huang ]
+  * add support for development build
+
+  [ Stephen Hemminger ]
+  * Rename VyattaNatRule to Vyatta::NatRule
+  * Convert to Vyatta::
+  * VyattaConfig -> Vyatta::Config
+  * extra space causes error
+  * Update to new naming Vyatta::IpTables:AddressFilter
+  * change VyattaNatRule to Vyatta::NatRule
+
+  [ Mohit Mehta ]
+  * Fix Bug 3887 Generate a warning message when NAT inbound/outbound-
+    interface does not match a configured interface
+
+  [ An-Cheng Huang ]
+  * update maintainer information
+  * "files" file should be removed before package build
+
+ -- An-Cheng Huang <ancheng@vyatta.com>  Thu, 08 Jan 2009 09:36:32 -0800
+
 vyatta-nat (0.12) unstable; urgency=low
 
 	  3.2.0
