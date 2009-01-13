@@ -1,3 +1,9 @@
+vyatta-nat (0.12.0+islavista1) unstable; urgency=low
+
+  * UNRELEASED
+
+ -- An-Cheng Huang <ancheng@vyatta.com>  Mon, 12 Jan 2009 16:46:16 -0800
+
 vyatta-nat (0.12) unstable; urgency=low
 
 	  3.2.0
