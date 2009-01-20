@@ -151,6 +151,8 @@ sub rule_str {
     return (undef, 'cannot specify inbound interface with '
                    . '"masquerade" or "source" rules')
       if (defined($self->{_inbound_if}));
+    
+    my $use_netmap = 0;
 
     if ($self->{_exclude}) {
       $rule_str .= "-j RETURN";
@@ -177,9 +179,16 @@ sub rule_str {
     my $to_src = '';
     if (defined($self->{_outside_addr}->{_addr})) {
       my $addr = $self->{_outside_addr}->{_addr};
-      return (undef, "\"$addr\" is not a valid IP address")
-        if (!Vyatta::TypeChecker::validateType('ipv4', $addr, 1));
-      $to_src .= $addr;
+      if ($addr =~ m/\//) {
+         return (undef, "\"$addr\" is not a valid IPv4net address")
+         if (!Vyatta::TypeChecker::validateType('ipv4net', $addr, 1));
+         $to_src .= $addr;
+         $use_netmap = 1;
+      } else {
+         return (undef, "\"$addr\" is not a valid IP address")
+         if (!Vyatta::TypeChecker::validateType('ipv4', $addr, 1));
+         $to_src .= $addr;
+      }
     } elsif (defined($self->{_outside_addr}->{_range}->{_start})
              && defined($self->{_outside_addr}->{_range}->{_stop})) {
       my $start = $self->{_outside_addr}->{_range}->{_start};
@@ -198,6 +207,10 @@ sub rule_str {
       if (!$can_use_port) {
         return (undef, "ports can only be specified when protocol is \"tcp\" "
                        . "or \"udp\" (currently \"$self->{_proto}\")");
+      }
+      if ($use_netmap) {
+        return (undef, "Cannot use ports with an IPv4net type outside-address as it 
+statically maps a whole network of addresses onto another network of addresses");
       }
       if ($self->{_type} ne "masquerade") {
         $to_src .= ":";
@@ -221,7 +234,13 @@ sub rule_str {
       if ($self->{_type} eq "masquerade") {
         $rule_str .= " --to-ports $to_src";
       } else {
-        $rule_str .= " --to-source $to_src";
+        if ($use_netmap) {
+         # replace "SNAT" with "NETMAP"
+         $rule_str =~ s/SNAT/NETMAP/;
+         $rule_str .= " --to $to_src";
+        } else {
+           $rule_str .= " --to-source $to_src";
+        }
       }
     } elsif ($self->{_type} ne "masquerade") {
       return (undef, "outside-address not specified");
@@ -231,6 +250,8 @@ sub rule_str {
     return (undef,
             'cannot specify outbound interface with "destination" rules')
       if (defined($self->{_outbound_if}));
+
+    my $use_netmap = 0;
 
     if ($self->{_exclude}) {
       $rule_str .= "-j RETURN";
@@ -250,12 +271,21 @@ sub rule_str {
       $rule_str .= " -p $self->{_proto}";
     }
 
-    my $to_dst = " --to-destination ";
+    my $to_dst = "";
     if (defined($self->{_inside_addr}->{_addr})) {
       my $addr = $self->{_inside_addr}->{_addr};
-      return (undef, "\"$addr\" is not a valid IP address")
-        if (!Vyatta::TypeChecker::validateType('ipv4', $addr, 1));
-      $to_dst .= $addr;
+      if ($addr =~ m/\//) {
+         return (undef, "\"$addr\" is not a valid IPv4net address")
+         if (!Vyatta::TypeChecker::validateType('ipv4net', $addr, 1));
+         $to_dst = " --to ";
+         $to_dst .= $addr;
+         $use_netmap = 1;
+      } else {
+         return (undef, "\"$addr\" is not a valid IP address")
+         if (!Vyatta::TypeChecker::validateType('ipv4', $addr, 1));
+         $to_dst = " --to-destination ";
+         $to_dst .= $addr;
+      }
     } elsif (defined($self->{_inside_addr}->{_range}->{_start})
              && defined($self->{_inside_addr}->{_range}->{_stop})) {
       my $start = $self->{_inside_addr}->{_range}->{_start};
@@ -263,6 +293,7 @@ sub rule_str {
       return (undef, "\"$start-$stop\" is not a valid IP range")
         if (!Vyatta::TypeChecker::validateType('ipv4', $start, 1)
             || !Vyatta::TypeChecker::validateType('ipv4', $stop, 1));
+      $to_dst = " --to-destination ";
       $to_dst .= "$start-$stop";
     } 
     
@@ -270,6 +301,10 @@ sub rule_str {
       if (!$can_use_port) {
         return (undef, "ports can only be specified when protocol is \"tcp\" "
                        . "or \"udp\" (currently \"$self->{_proto}\")");
+      }
+      if ($use_netmap) {
+        return (undef, "Cannot use ports with an IPv4net type outside-address as it
+statically maps a whole network of addresses onto another network of addresses");
       }
       my ($success, $err) = (undef, undef);
       if ($self->{_inside_addr}->{_port} =~ /-/) {
@@ -286,8 +321,14 @@ sub rule_str {
     
     if ($self->{_exclude}) {
       # inside-address has no effect for "exclude" rules
-    } elsif ($to_dst ne ' --to-destination ') {
-      $rule_str .= $to_dst;
+    } elsif ($to_dst ne "") {
+        if ($use_netmap) {
+         # replace "DNAT" with "NETMAP"
+         $rule_str =~ s/DNAT/NETMAP/;
+         $rule_str .= " $to_dst";
+        } else {
+           $rule_str .= " $to_dst";
+        }
     } else {
       return (undef, "inside-address not specified");
     }
