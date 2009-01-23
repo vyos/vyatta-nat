@@ -30,7 +30,7 @@ while (<STATS>) {
     $skey = "";
   }
 
-  if ($skey ne "" && (m/SNAT/ || m/DNAT/ || m/MASQUERADE/ || m/RETURN/)) {
+  if ($skey ne "" && (m/SNAT/ || m/DNAT/ || m/MASQUERADE/ || m/RETURN/ || m/NETMAP/)) {
     m/^\s*(\d+[KMG]?)\s+(\d+[KMG]?)\s/;
     push @{$stats{$skey}}, ($1, $2);
   }

@@ -1,3 +1,2 @@
 help: Show configured NAT rule set
-run: /opt/vyatta/sbin/vyatta-show-nat.pl \
-       ${vyatta_datadir}/xsl/show_nat_rules.xsl
+run: /opt/vyatta/sbin/vyatta-show-nat-rules.pl
