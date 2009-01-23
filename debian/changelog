@@ -1,3 +1,12 @@
+vyatta-nat (0.12.3) unstable; urgency=low
+
+  * Fix statistics in "show nat statistics" when target is NETMAP
+  * Script to generate a new output for the "show nat rules" command
+  * Fix Bug 3401 some indication is needed for the excluded rules in
+    the "show nat rules" result
+
+ -- Mohit Mehta <mohit.mehta@vyatta.com>  Fri, 23 Jan 2009 12:06:49 -0800
+
 vyatta-nat (0.12.2) unstable; urgency=low
 
   * UNRELEASED
