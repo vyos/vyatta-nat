@@ -216,16 +216,22 @@ statically maps a whole network of addresses onto another network of addresses")
         $to_src .= ":";
       }
       my ($success, $err) = (undef, undef);
-      if ($self->{_outside_addr}->{_port} =~ /-/) {
+      my $port = $self->{_outside_addr}->{_port};
+      if ($port =~ /-/) {
         ($success, $err)
-          = Vyatta::Misc::isValidPortRange($self->{_outside_addr}->{_port}, '-');
+          = Vyatta::Misc::isValidPortRange($port, '-');
+        return (undef, $err) if (!defined($success));
+      } elsif ($port =~ /^\d/) {
+        ($success, $err)
+          = Vyatta::Misc::isValidPortNumber($port);
         return (undef, $err) if (!defined($success));
       } else {
-        ($success, $err)
-          = Vyatta::Misc::isValidPortNumber($self->{_outside_addr}->{_port});
+	($success, $err)
+	  = Vyatta::Misc::isValidPortName($port);
         return (undef, $err) if (!defined($success));
+	$port = getservbyname($port, $self->{_proto});
       }
-      $to_src .= "$self->{_outside_addr}->{_port}";
+      $to_src .= "$port";
     }
     
     if ($self->{_exclude}) {
@@ -307,16 +313,22 @@ statically maps a whole network of addresses onto another network of addresses")
 statically maps a whole network of addresses onto another network of addresses");
       }
       my ($success, $err) = (undef, undef);
-      if ($self->{_inside_addr}->{_port} =~ /-/) {
+      my $port = $self->{_inside_addr}->{_port};
+      if ($port =~ /-/) {
         ($success, $err)
-          = Vyatta::Misc::isValidPortRange($self->{_inside_addr}->{_port}, '-');
+          = Vyatta::Misc::isValidPortRange($port, '-');
+        return (undef, $err) if (!defined($success));
+      } elsif ($port =~ /^\d/) {
+	($success, $err)
+	  = Vyatta::Misc::isValidPortNumber($port);
         return (undef, $err) if (!defined($success));
       } else {
-        ($success, $err)
-          = Vyatta::Misc::isValidPortNumber($self->{_inside_addr}->{_port});
+	  ($success, $err)
+	  = Vyatta::Misc::isValidPortName($port);
         return (undef, $err) if (!defined($success));
+	$port = getservbyname($port, $self->{_proto});
       }
-      $to_dst .= ":$self->{_inside_addr}->{_port}";
+      $to_dst .= ":$port";
     }
     
     if ($self->{_exclude}) {
