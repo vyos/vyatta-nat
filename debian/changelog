@@ -1,3 +1,9 @@
+vyatta-nat (0.12.4) unstable; urgency=low
+
+  * Fix 4107: nat inside-address port doesn't allow name of port
+
+ -- Stig Thormodsrud <stig@io.vyatta.com>  Mon, 09 Feb 2009 10:24:12 -0800
+
 vyatta-nat (0.12.3) unstable; urgency=low
 
   * Fix statistics in "show nat statistics" when target is NETMAP
