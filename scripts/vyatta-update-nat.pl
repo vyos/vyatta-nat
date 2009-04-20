@@ -28,7 +28,12 @@ my $config = new Vyatta::Config;
 $config->setLevel("service nat rule");
 my %rules = $config->listNodeStatus();
 my $rule;
-open(OUT, ">>/dev/null") or exit 1;
+my $debug = 0;
+if ($debug) {
+  open(OUT, ">>/tmp/nat") or exit 1;
+} else {
+  open(OUT, ">>/dev/null") or exit 1;
+}
 my %ipt_rulenum = (
                     source      => 2,
                     destination => 1,
@@ -65,6 +70,8 @@ if ($? >> 8) {
 my $all_deleted = 1;
 for $rule (@rule_keys) {
   print OUT "$rule: $rules{$rule}\n";
+  my $tmp = `iptables -L -nv --line -t nat`;
+  print OUT "iptables before:\n$tmp\n";
   my $nrule = new Vyatta::NatRule;
   $nrule->setup("service nat rule $rule");
   my $otype = $nrule->orig_type();
@@ -84,23 +91,29 @@ for $rule (@rule_keys) {
     if (!defined($ntype)) {
       exit 3;
     }
-    $ipt_rulenum{$ntype} += 1;
+    my $ipt_rules = $nrule->get_num_ipt_rules();
+    $ipt_rulenum{$ntype} += $ipt_rules;
     next;
   } elsif ($rules{$rule} eq "deleted") {
     # $ntype should be empty
     if (!defined($otype)) {
       exit 4;
     }
-    $cmd = "iptables -t nat -D $chain_name{$otype} $ipt_rulenum{$otype}";
-    print OUT "$cmd\n";
-    if (system($cmd)) {
-      exit 1;
+    my $orule = new Vyatta::NatRule;
+    $orule->setupOrig("service nat rule $rule");
+    my $ipt_rules = $orule->get_num_ipt_rules();
+    for (1 .. $ipt_rules) {
+      $cmd = "iptables -t nat -D $chain_name{$otype} $ipt_rulenum{$otype}";
+      print OUT "$cmd\n";
+      if (system($cmd)) {
+        exit 1;
+      }
     }
     next;
   }
   
-  my ($str, $err) = $nrule->rule_str();
-  if (!defined($str)) {
+  my ($err, @rule_strs) = $nrule->rule_str();
+  if (defined $err) {
     # rule check failed => return error
     print OUT "NAT configuration error: $err\n";
     print STDERR "NAT configuration error: $err\n";
@@ -112,34 +125,46 @@ for $rule (@rule_keys) {
     if (!defined($ntype)) {
       exit 6;
     }
-    $cmd = "iptables -t nat -I $chain_name{$ntype} $ipt_rulenum{$ntype} " .
-           "$str";
-    print OUT "$cmd\n";
-    if (system($cmd)) {
-      exit 1;
+    foreach my $rule_str (@rule_strs) {
+      $cmd = "iptables -t nat -I $chain_name{$ntype} $ipt_rulenum{$ntype} " .
+          "$rule_str";
+      print OUT "$cmd\n";
+      if (system($cmd)) {
+        exit 1;
+      }
+      $ipt_rulenum{$ntype}++;
     }
-    $ipt_rulenum{$ntype} += 1;
+
   } elsif ($rules{$rule} eq "changed") {
     # $otype and $ntype may not be the same
     if (!defined($otype) || !defined($ntype)) {
       exit 7;
     }
-    $cmd = "iptables -t nat -I $chain_name{$ntype} $ipt_rulenum{$ntype} " .
-           "$str";
-    print OUT "$cmd\n";
-    if (system($cmd)) {
-      exit 1;
-    }
+
+    # delete the old rule(s)
+    my $orule = new Vyatta::NatRule;
+    $orule->setupOrig("service nat rule $rule");
+    my $ipt_rules = $orule->get_num_ipt_rules();
     my $idx = $ipt_rulenum{$otype};
-    if ($otype eq $ntype) {
-      $idx += 1;
+    for (1 .. $ipt_rules) {
+      $cmd = "iptables -t nat -D $chain_name{$otype} $idx";
+      print OUT "$cmd\n";
+      if (system($cmd)) {
+        exit 1;
+      }
     }
-    $cmd = "iptables -t nat -D $chain_name{$otype} $idx";
-    print OUT "$cmd\n";
-    if (system($cmd)) {
-      exit 1;
+
+    # add the new rule(s)
+    foreach my $rule_str (@rule_strs) {
+      $cmd = "iptables -t nat -I $chain_name{$ntype} $ipt_rulenum{$ntype} " .
+          "$rule_str";
+      print OUT "$cmd\n";
+      if (system($cmd)) {
+        exit 1;
+      }
+      $ipt_rulenum{$ntype}++;
     }
-    $ipt_rulenum{$ntype} += 1;
+
   }
 }
 
@@ -150,3 +175,8 @@ if ($all_deleted) {
 close OUT;
 exit 0;
 
+# Local Variables:
+# mode: perl
+# indent-tabs-mode: nil
+# perl-indent-level: 2
+# End:

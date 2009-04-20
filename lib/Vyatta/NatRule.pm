@@ -11,12 +11,14 @@ my $src = new Vyatta::IpTables::AddressFilter;
 my $dst = new Vyatta::IpTables::AddressFilter;
 
 my %fields = (
+  _rule_number  => undef,
   _type	        => undef,
   _orig_type    => undef,
   _inbound_if   => undef,
   _outbound_if  => undef,
   _proto        => undef,
   _exclude      => undef,
+  _log          => undef,
   _inside_addr  => {
                     _addr => undef,
                     _range  => {
@@ -51,13 +53,15 @@ sub setup {
   my $config = new Vyatta::Config;
 
   $config->setLevel("$level");
-
+  
+  $self->{_rule_number} = $config->returnParent("..");
   $self->{_type} = $config->returnValue("type");
   $self->{_orig_type} = $config->returnOrigValue("type");
   $self->{_inbound_if} = $config->returnValue("inbound-interface");
   $self->{_outbound_if} = $config->returnValue("outbound-interface");
   $self->{_proto} = $config->returnValue("protocol");
   $self->{_exclude} = $config->exists("exclude");
+  $self->{_log} = $config->returnValue("log");
   
   $self->{_inside_addr}->{_addr}
     = $config->returnValue("inside-address address");
@@ -97,12 +101,14 @@ sub setupOrig {
 
   $config->setLevel("$level");
 
+  $self->{_rule_number} = $config->returnParent("..");
   $self->{_type} = $config->returnOrigValue("type");
   $self->{_orig_type} = $config->returnOrigValue("type");
   $self->{_inbound_if} = $config->returnOrigValue("inbound-interface");
   $self->{_outbound_if} = $config->returnOrigValue("outbound-interface");
   $self->{_proto} = $config->returnOrigValue("protocol");
   $self->{_exclude} = $config->existsOrig("exclude");
+  $self->{_log} = $config->returnOrigValue("log");
   
   $self->{_inside_addr}->{_addr}
     = $config->returnOrigValue("inside-address address");
@@ -136,11 +142,42 @@ sub setupOrig {
   return 0;
 }
 
-# returns (rule, error)
+sub get_num_ipt_rules {
+  my $self = shift;
+  my $ipt_rules = 1;
+  if ("$self->{_log}" eq 'enable') {
+      $ipt_rules++;
+  }
+  return $ipt_rules;
+}
+
+my %nat_type_hash = (
+  'SNAT'       => 'SNAT',
+  'DNAT'       => 'DNAT',
+  'MASQUERADE' => 'MASQ',
+  'RETURN'     => 'EXCLUDE',
+  'NETMAP'     => 'NETMAP',
+);
+
+sub get_log_prefix {
+  my ($rule_num, $jump_target) = @_;
+
+  # In iptables it allows a 29 character log_prefix, but we ideally
+  # want to include "[nat-type-$rule_num] "
+  #                  1 3 1  7    1   4  1 1  = 19 
+  # so no truncation is needed.
+  my $nat_type = $nat_type_hash{$jump_target};
+  my $log_prefix  = "[NAT-$rule_num-$nat_type] ";
+  return $log_prefix;
+}
+
+# returns (error, @rules)
 sub rule_str {
   my ($self) = @_;
   my $rule_str = "";
   my $can_use_port = 1;
+  my $jump_target = '';
+  my $jump_param  = '';
 
   if (!defined($self->{_proto}) ||
       (($self->{_proto} ne "tcp") && ($self->{_proto} ne "6")
@@ -148,18 +185,18 @@ sub rule_str {
     $can_use_port = 0;
   }
   if (($self->{_type} eq "source") || ($self->{_type} eq "masquerade")) {
-    return (undef, 'cannot specify inbound interface with '
-                   . '"masquerade" or "source" rules')
+    return ('cannot specify inbound interface with '
+                   . '"masquerade" or "source" rules', undef)
       if (defined($self->{_inbound_if}));
     
     my $use_netmap = 0;
 
     if ($self->{_exclude}) {
-      $rule_str .= "-j RETURN";
+      $jump_target = 'RETURN';
     } elsif ($self->{_type} eq "masquerade") {
-      $rule_str .= "-j MASQUERADE";
+      $jump_target = 'MASQUERADE';
     } else {
-      $rule_str .= "-j SNAT";
+      $jump_target = 'SNAT';
     }
     if (defined($self->{_outbound_if})) {
       $rule_str .= " -o $self->{_outbound_if}";
@@ -167,7 +204,7 @@ sub rule_str {
       # "masquerade" requires outbound_if.
       # also make this a requirement for "source" to prevent users from
       # inadvertently NATing loopback traffic.
-      return (undef, "outbound-interface not specified");
+      return ('outbound-interface not specified', undef);
     }
 
     if (defined($self->{_proto})) {
@@ -180,12 +217,12 @@ sub rule_str {
     if (defined($self->{_outside_addr}->{_addr})) {
       my $addr = $self->{_outside_addr}->{_addr};
       if ($addr =~ m/\//) {
-         return (undef, "\"$addr\" is not a valid IPv4net address")
+         return ("\"$addr\" is not a valid IPv4net address", undef)
          if (!Vyatta::TypeChecker::validateType('ipv4net', $addr, 1));
          $to_src .= $addr;
          $use_netmap = 1;
       } else {
-         return (undef, "\"$addr\" is not a valid IP address")
+         return ("\"$addr\" is not a valid IP address", undef)
          if (!Vyatta::TypeChecker::validateType('ipv4', $addr, 1));
          $to_src .= $addr;
       }
@@ -193,24 +230,25 @@ sub rule_str {
              && defined($self->{_outside_addr}->{_range}->{_stop})) {
       my $start = $self->{_outside_addr}->{_range}->{_start};
       my $stop = $self->{_outside_addr}->{_range}->{_stop};
-      return (undef, "\"$start-$stop\" is not a valid IP range")
+      return ("\"$start-$stop\" is not a valid IP range", undef)
         if (!Vyatta::TypeChecker::validateType('ipv4', $start, 1)
             || !Vyatta::TypeChecker::validateType('ipv4', $stop, 1));
       $to_src .= "$start-$stop";
     }
    
     if (($to_src ne "") && ($self->{_type} eq "masquerade")) {
-      return (undef, "cannot specify outside IP address with \"masquerade\"");
+      return ("cannot specify outside IP address with \"masquerade\"", undef);
     }
 
     if (defined($self->{_outside_addr}->{_port})) {
       if (!$can_use_port) {
-        return (undef, "ports can only be specified when protocol is \"tcp\" "
-                       . "or \"udp\" (currently \"$self->{_proto}\")");
+        return ("ports can only be specified when protocol is \"tcp\" "
+		. "or \"udp\" (currently \"$self->{_proto}\")", undef);
       }
       if ($use_netmap) {
-        return (undef, "Cannot use ports with an IPv4net type outside-address as it 
-statically maps a whole network of addresses onto another network of addresses");
+        return ("Cannot use ports with an IPv4net type outside-address as it " . 
+                "statically maps a whole network of addresses onto another " .
+                "network of addresses", undef);
       }
       if ($self->{_type} ne "masquerade") {
         $to_src .= ":";
@@ -220,15 +258,14 @@ statically maps a whole network of addresses onto another network of addresses")
       if ($port =~ /-/) {
         ($success, $err)
           = Vyatta::Misc::isValidPortRange($port, '-');
-        return (undef, $err) if (!defined($success));
+        return ($err, undef) if (!defined($success));
       } elsif ($port =~ /^\d/) {
         ($success, $err)
           = Vyatta::Misc::isValidPortNumber($port);
-        return (undef, $err) if (!defined($success));
+        return ($err, undef) if (!defined($success));
       } else {
-	($success, $err)
-	  = Vyatta::Misc::isValidPortName($port);
-        return (undef, $err) if (!defined($success));
+	($success, $err) = Vyatta::Misc::isValidPortName($port);
+        return ($err, undef) if !defined $success ;
 	$port = getservbyname($port, $self->{_proto});
       }
       $to_src .= "$port";
@@ -238,31 +275,30 @@ statically maps a whole network of addresses onto another network of addresses")
       # outside-address has no effect for "exclude" rules
     } elsif ($to_src ne '') {
       if ($self->{_type} eq "masquerade") {
-        $rule_str .= " --to-ports $to_src";
+        $jump_param .= " --to-ports $to_src";
       } else {
         if ($use_netmap) {
          # replace "SNAT" with "NETMAP"
-         $rule_str =~ s/SNAT/NETMAP/;
-         $rule_str .= " --to $to_src";
+         $jump_target = 'NETMAP';
+         $jump_param .= " --to $to_src";
         } else {
-           $rule_str .= " --to-source $to_src";
+           $jump_param .= " --to-source $to_src";
         }
       }
     } elsif ($self->{_type} ne "masquerade") {
-      return (undef, "outside-address not specified");
+      return ('outside-address not specified', undef);
     }
   } elsif ($self->{_type} eq "destination") {
     # type is destination
-    return (undef,
-            'cannot specify outbound interface with "destination" rules')
-      if (defined($self->{_outbound_if}));
+    return ('cannot specify outbound interface with "destination" rules', undef)
+	if (defined($self->{_outbound_if}));
 
     my $use_netmap = 0;
 
     if ($self->{_exclude}) {
-      $rule_str .= "-j RETURN";
+      $jump_target = 'RETURN';
     } else {
-      $rule_str .= "-j DNAT";
+      $jump_target = 'DNAT';
     }
   
     if (defined($self->{_inbound_if})) {
@@ -270,7 +306,7 @@ statically maps a whole network of addresses onto another network of addresses")
     } else {
       # make this a requirement to prevent users from
       # inadvertently NATing loopback traffic.
-      return (undef, "inbound-interface not specified");
+      return ('inbound-interface not specified', undef);
     }
   
     if (defined($self->{_proto})) {
@@ -281,14 +317,14 @@ statically maps a whole network of addresses onto another network of addresses")
     if (defined($self->{_inside_addr}->{_addr})) {
       my $addr = $self->{_inside_addr}->{_addr};
       if ($addr =~ m/\//) {
-         return (undef, "\"$addr\" is not a valid IPv4net address")
+         return ("\"$addr\" is not a valid IPv4net address", undef)
          if (!Vyatta::TypeChecker::validateType('ipv4net', $addr, 1));
          $to_dst = " --to ";
          $to_dst .= $addr;
          $use_netmap = 1;
       } else {
-         return (undef, "\"$addr\" is not a valid IP address")
-         if (!Vyatta::TypeChecker::validateType('ipv4', $addr, 1));
+         return ("\"$addr\" is not a valid IP address", undef)
+	     if (!Vyatta::TypeChecker::validateType('ipv4', $addr, 1));
          $to_dst = " --to-destination ";
          $to_dst .= $addr;
       }
@@ -296,7 +332,7 @@ statically maps a whole network of addresses onto another network of addresses")
              && defined($self->{_inside_addr}->{_range}->{_stop})) {
       my $start = $self->{_inside_addr}->{_range}->{_start};
       my $stop = $self->{_inside_addr}->{_range}->{_stop};
-      return (undef, "\"$start-$stop\" is not a valid IP range")
+      return ("\"$start-$stop\" is not a valid IP range", undef)
         if (!Vyatta::TypeChecker::validateType('ipv4', $start, 1)
             || !Vyatta::TypeChecker::validateType('ipv4', $stop, 1));
       $to_dst = " --to-destination ";
@@ -305,27 +341,25 @@ statically maps a whole network of addresses onto another network of addresses")
     
     if (defined($self->{_inside_addr}->{_port})) {
       if (!$can_use_port) {
-        return (undef, "ports can only be specified when protocol is \"tcp\" "
-                       . "or \"udp\" (currently \"$self->{_proto}\")");
+        return ("ports can only be specified when protocol is \"tcp\" "
+		. "or \"udp\" (currently \"$self->{_proto}\")", undef);
       }
       if ($use_netmap) {
-        return (undef, "Cannot use ports with an IPv4net type outside-address as it
-statically maps a whole network of addresses onto another network of addresses");
+	return ("Cannot use ports with an IPv4net type outside-address as it " 
+		. "statically maps a whole network of addresses onto another "
+                . "network of addresses", undef);
       }
       my ($success, $err) = (undef, undef);
       my $port = $self->{_inside_addr}->{_port};
       if ($port =~ /-/) {
-        ($success, $err)
-          = Vyatta::Misc::isValidPortRange($port, '-');
-        return (undef, $err) if (!defined($success));
+	($success, $err) = Vyatta::Misc::isValidPortRange($port, '-');
+        return ($err, undef) if (!defined($success));
       } elsif ($port =~ /^\d/) {
-	($success, $err)
-	  = Vyatta::Misc::isValidPortNumber($port);
-        return (undef, $err) if (!defined($success));
+	($success, $err) = Vyatta::Misc::isValidPortNumber($port);
+        return ($err, undef) if (!defined($success));
       } else {
-	  ($success, $err)
-	  = Vyatta::Misc::isValidPortName($port);
-        return (undef, $err) if (!defined($success));
+	($success, $err) = Vyatta::Misc::isValidPortName($port);
+        return ($err, undef) if (!defined($success));
 	$port = getservbyname($port, $self->{_proto});
       }
       $to_dst .= ":$port";
@@ -336,35 +370,44 @@ statically maps a whole network of addresses onto another network of addresses")
     } elsif ($to_dst ne "") {
         if ($use_netmap) {
          # replace "DNAT" with "NETMAP"
-         $rule_str =~ s/DNAT/NETMAP/;
-         $rule_str .= " $to_dst";
+         $jump_target = 'NETMAP';
+         $jump_param .= " $to_dst";
         } else {
-           $rule_str .= " $to_dst";
+	    $jump_param .= " $to_dst";
         }
     } else {
-      return (undef, "inside-address not specified");
+      return ("inside-address not specified", undef);
     }
   } else {
-    return (undef, "rule type not specified/valid");
+    return ("rule type not specified/valid", undef);
   }
 
   # source rule string
   my ($src_str, $src_err) = $src->rule();
-  return (undef, $src_err) if (!defined($src_str));
+  return ($src_err, undef) if (!defined($src_str));
   
   # destination rule string
   my ($dst_str, $dst_err) = $dst->rule();
-  return (undef, $dst_err) if (!defined($dst_str));
+  return ($dst_err, undef) if (!defined($dst_str));
 
   if ((grep /multiport/, $src_str) || (grep /multiport/, $dst_str)) {
     if ((grep /sport/, $src_str) && (grep /dport/, $dst_str)) {
-      return (undef, 'cannot specify multiple ports when both '
-                     . 'source and destination ports are specified');
+      return ('cannot specify multiple ports when both source and destination '
+              . 'ports are specified', undef);
     }
   }
   $rule_str .= " $src_str $dst_str";
-
-  return ($rule_str, undef);
+  if ("$self->{_log}" eq "enable") {
+    my $log_rule   = $rule_str;
+    my $rule_num = $self->{_rule_number};
+    my $log_prefix = get_log_prefix($rule_num, $jump_target);
+    $log_rule     .= " -j LOG --log-prefix \"$log_prefix\" ";
+    $rule_str     .= " -j $jump_target $jump_param";
+    return (undef, $log_rule, $rule_str);
+  } else {
+    $rule_str .= " -j $jump_target $jump_param";
+    return (undef, $rule_str);
+  }
 }
 
 sub orig_type {
@@ -427,3 +470,8 @@ sub outputXml {
 
 1;
 
+# Local Variables:
+# mode: perl
+# indent-tabs-mode: nil
+# perl-indent-level: 2
+# End:
