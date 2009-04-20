@@ -1,3 +1,9 @@
+vyatta-nat (0.12.5) unstable; urgency=low
+
+  * Add log option to NAT rules.
+
+ -- Stig Thormodsrud <stig@vyatta.com>  Mon, 20 Apr 2009 13:58:44 -0700
+
 vyatta-nat (0.12.4) unstable; urgency=low
 
   * Fix 4107: nat inside-address port doesn't allow name of port
