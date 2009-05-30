@@ -1,3 +1,9 @@
+vyatta-nat (0.12.6) unstable; urgency=low
+
+  * UNRELEASED
+
+ -- An-Cheng Huang <ancheng@vyatta.com>  Fri, 29 May 2009 18:36:21 -0700
+
 vyatta-nat (0.12.5) unstable; urgency=low
 
   * Add log option to NAT rules.
