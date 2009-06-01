@@ -178,6 +178,7 @@ sub rule_str {
   my $can_use_port = 1;
   my $jump_target = '';
   my $jump_param  = '';
+  my $use_netmap = 0;
 
   if (!defined($self->{_proto}) ||
       (($self->{_proto} ne "tcp") && ($self->{_proto} ne "6")
@@ -188,8 +189,13 @@ sub rule_str {
     return ('cannot specify inbound interface with '
                    . '"masquerade" or "source" rules', undef)
       if (defined($self->{_inbound_if}));
-    
-    my $use_netmap = 0;
+
+    if (defined($self->{_inside_addr}->{_addr}) || 
+	defined($self->{_inside_addr}->{_port})	|| 
+	(defined($self->{_inside_addr}->{_range}->{_start}) 
+		&& defined($self->{_inside_addr}->{_range}->{_stop}))) {
+      print "NAT configuration warning:\n'inside-address' is not a relevant option for 'type source'\n";
+    }
 
     if ($self->{_exclude}) {
       $jump_target = 'RETURN';
@@ -293,7 +299,12 @@ sub rule_str {
     return ('cannot specify outbound interface with "destination" rules', undef)
 	if (defined($self->{_outbound_if}));
 
-    my $use_netmap = 0;
+    if (defined($self->{_outside_addr}->{_addr}) ||
+        defined($self->{_outside_addr}->{_port}) ||
+        (defined($self->{_outside_addr}->{_range}->{_start})
+                && defined($self->{_outside_addr}->{_range}->{_stop}))) {
+      print "NAT configuration warning:\n'outside-address' is not a relevant option for 'type destination'\n";
+    }
 
     if ($self->{_exclude}) {
       $jump_target = 'RETURN';
@@ -396,6 +407,61 @@ sub rule_str {
               . 'ports are specified', undef);
     }
   }
+
+  # if using netmap then source|destination address should have the same prefix
+  # as the outside|inside address depending on the whether the type is src|dst
+  if ($self->{_type} eq "source" && $use_netmap) {
+
+    if (!defined $src->{_network}){
+      return ("\nsource address needs to be defined as a subnet with the same network prefix as outside-address" .
+              "\nwhen outside-address is defined with a prefix for static network mapping "
+              , undef);
+    }
+
+    my $outside_addr_mask = $self->{_outside_addr}->{_addr};
+    my $src_addr_mask = $src->{_network};
+    $outside_addr_mask =~ s/.+\///;
+    $src_addr_mask =~ s/.+\///;
+
+    if (!($outside_addr_mask == $src_addr_mask)) {
+      return ("\nsource address should be a subnet with the same network prefix as outside-address" .
+              "\nwhen outside-address is defined with a prefix for static network mapping "
+              , undef);
+    }
+
+    if ($src->{_network} =~ /\!/) {
+      return ("\ncannot define a negated source address when outside-address" .
+              "\nis defined with a prefix for static network mapping "
+              , undef);
+
+    }
+  } elsif ($self->{_type} eq "destination" && $use_netmap) {
+
+    if (!defined $dst->{_network}){
+      return ("\ndestination address needs to be defined as a subnet with the same network prefix as inside-address" .
+              "\nwhen inside-address is defined with a prefix for static network mapping "
+              , undef);
+    }
+
+    my $inside_addr_mask = $self->{_inside_addr}->{_addr};
+    my $dst_addr_mask = $dst->{_network};
+    $inside_addr_mask =~ s/.+\///;
+    $dst_addr_mask =~ s/.+\///;
+
+    if (!($inside_addr_mask == $dst_addr_mask)) {
+      return ("\ndestination address should be a subnet with the same network prefix as inside-address" .
+              "\nwhen inside-address is defined with a prefix for static network mapping"
+              , undef);
+    }
+
+    if ($dst->{_network} =~ /\!/) {
+      return ("\ncannot define a negated destination address when inside-address" .
+              "\nis defined with a prefix for static network mapping "
+              , undef);
+
+    }
+  }
+
   $rule_str .= " $src_str $dst_str";
   if ("$self->{_log}" eq "enable") {
     my $log_rule   = $rule_str;
