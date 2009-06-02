@@ -1,3 +1,10 @@
+vyatta-nat (0.12.7) unstable; urgency=low
+
+  * * add check to make sure source|destination address is a subnet with
+    the
+
+ -- Mohit Mehta <mohit.mehta@vyatta.com>  Mon, 01 Jun 2009 17:10:33 -0700
+
 vyatta-nat (0.12.6) unstable; urgency=low
 
   * UNRELEASED
