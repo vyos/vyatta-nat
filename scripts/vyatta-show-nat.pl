@@ -53,6 +53,7 @@ my @rules = sort numerically @rules_pre;
 for $rule (@rules) {
   my $nrule = new Vyatta::NatRule;
   $nrule->setupOrig("service nat rule $rule");
+  next if defined $nrule->{_disable};
   my $ntype = $nrule->orig_type(); 
   print RENDER "  <row>\n";
   print RENDER "    <rule_num>$rule</rule_num>\n";

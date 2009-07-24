@@ -18,6 +18,7 @@ my %fields = (
   _outbound_if  => undef,
   _proto        => undef,
   _exclude      => undef,
+  _disable      => undef,
   _log          => undef,
   _inside_addr  => {
                     _addr => undef,
@@ -61,6 +62,7 @@ sub setup {
   $self->{_outbound_if} = $config->returnValue("outbound-interface");
   $self->{_proto} = $config->returnValue("protocol");
   $self->{_exclude} = $config->exists("exclude");
+  $self->{_disable} = $config->exists("disable");
   $self->{_log} = $config->returnValue("log");
   
   $self->{_inside_addr}->{_addr}
@@ -108,6 +110,7 @@ sub setupOrig {
   $self->{_outbound_if} = $config->returnOrigValue("outbound-interface");
   $self->{_proto} = $config->returnOrigValue("protocol");
   $self->{_exclude} = $config->existsOrig("exclude");
+  $self->{_disable} = $config->existsOrig("disable");
   $self->{_log} = $config->returnOrigValue("log");
   
   $self->{_inside_addr}->{_addr}
@@ -142,8 +145,15 @@ sub setupOrig {
   return 0;
 }
 
+sub is_disabled {
+  my $self = shift;
+  return 1 if defined $self->{_disable};
+  return 0;
+}
+
 sub get_num_ipt_rules {
   my $self = shift;
+  return 0 if defined $self->{_disable};
   my $ipt_rules = 1;
   if ("$self->{_log}" eq 'enable') {
       $ipt_rules++;
@@ -179,7 +189,7 @@ sub rule_str {
   my $jump_target = '';
   my $jump_param  = '';
   my $use_netmap = 0;
-
+  
   if (!defined($self->{_proto}) ||
       (($self->{_proto} ne "tcp") && ($self->{_proto} ne "6")
        && ($self->{_proto} ne "udp") && ($self->{_proto} ne "17"))) {
@@ -462,6 +472,8 @@ sub rule_str {
     }
   }
 
+  return (undef, undef) if defined $self->{_disable};
+  
   $rule_str .= " $src_str $dst_str";
   if ("$self->{_log}" eq "enable") {
     my $log_rule   = $rule_str;

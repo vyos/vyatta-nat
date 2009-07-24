@@ -172,6 +172,7 @@ for $rule (@rules) {
   my $dst = new Vyatta::IpTables::AddressFilter;
   
   $nrule->setupOrig("service nat rule $rule");
+  next if defined $nrule->{_disable};
   $rulenum = "X" . $rule if defined $nrule->{_exclude};
   $type = $nat_type{$nrule->{_type}};
   $protocol = $nrule->{_proto} if defined $nrule->{_proto};

@@ -126,6 +126,7 @@ for $rule (@rule_keys) {
       exit 6;
     }
     foreach my $rule_str (@rule_strs) {
+      next if !defined $rule_str;
       $cmd = "iptables -t nat -I $chain_name{$ntype} $ipt_rulenum{$ntype} " .
           "$rule_str";
       print OUT "$cmd\n";
@@ -156,6 +157,7 @@ for $rule (@rule_keys) {
 
     # add the new rule(s)
     foreach my $rule_str (@rule_strs) {
+      next if !defined $rule_str;
       $cmd = "iptables -t nat -I $chain_name{$ntype} $ipt_rulenum{$ntype} " .
           "$rule_str";
       print OUT "$cmd\n";
