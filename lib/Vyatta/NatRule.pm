@@ -158,6 +158,10 @@ sub get_num_ipt_rules {
   if ("$self->{_log}" eq 'enable') {
       $ipt_rules++;
   }
+  if (defined $self->{_proto} && $self->{_proto} eq 'tcp_udp') {
+      $ipt_rules++;
+      $ipt_rules++ if $self->{_log} eq 'enable';
+  }
   return $ipt_rules;
 }
 
@@ -189,10 +193,12 @@ sub rule_str {
   my $jump_target = '';
   my $jump_param  = '';
   my $use_netmap = 0;
+  my $tcp_and_udp = 0; 
   
   if (!defined($self->{_proto}) ||
-      (($self->{_proto} ne "tcp") && ($self->{_proto} ne "6")
-       && ($self->{_proto} ne "udp") && ($self->{_proto} ne "17"))) {
+      (($self->{_proto} ne "tcp_udp") 
+        && ($self->{_proto} ne "tcp") && ($self->{_proto} ne "6")
+        && ($self->{_proto} ne "udp") && ($self->{_proto} ne "17"))) {
     $can_use_port = 0;
   }
   if (($self->{_type} eq "source") || ($self->{_type} eq "masquerade")) {
@@ -226,7 +232,12 @@ sub rule_str {
     if (defined($self->{_proto})) {
       my $str = $self->{_proto};
       $str =~ s/^\!(.*)$/! $1/;
-      $rule_str .= " -p $str";
+      if ($str eq 'tcp_udp') {
+        $tcp_and_udp = 1;
+        $rule_str .= " -p tcp"; # we'll add the '-p udp' to 2nd rule later
+      } else {
+        $rule_str .= " -p $str";
+      }
     }
 
     my $to_src = '';
@@ -259,7 +270,7 @@ sub rule_str {
     if (defined($self->{_outside_addr}->{_port})) {
       if (!$can_use_port) {
         return ("ports can only be specified when protocol is \"tcp\" "
-		. "or \"udp\" (currently \"$self->{_proto}\")", undef);
+		. "\"udp\" or \"tcp_udp\" (currently \"$self->{_proto}\")", undef);
       }
       if ($use_netmap) {
         return ("Cannot use ports with an IPv4net type outside-address as it " . 
@@ -280,9 +291,17 @@ sub rule_str {
           = Vyatta::Misc::isValidPortNumber($port);
         return ($err, undef) if (!defined($success));
       } else {
-	($success, $err) = Vyatta::Misc::isValidPortName($port);
+        if ($self->{_proto} eq 'tcp_udp') {
+  ($success, $err) = Vyatta::Misc::isValidPortName($port, 'tcp');
         return ($err, undef) if !defined $success ;
-	$port = getservbyname($port, $self->{_proto});
+  ($success, $err) = Vyatta::Misc::isValidPortName($port, 'udp');
+        return ($err, undef) if !defined $success ;
+        $port = getservbyname($port, 'tcp');
+        } else {
+	($success, $err) = Vyatta::Misc::isValidPortName($port, $self->{_proto});
+        return ($err, undef) if !defined $success ;
+        $port = getservbyname($port, $self->{_proto});
+        }
       }
       $to_src .= "$port";
     }
@@ -331,7 +350,14 @@ sub rule_str {
     }
   
     if (defined($self->{_proto})) {
-      $rule_str .= " -p $self->{_proto}";
+      my $str = $self->{_proto};
+      $str =~ s/^\!(.*)$/! $1/;
+      if ($str eq 'tcp_udp') {
+        $tcp_and_udp = 1;
+        $rule_str .= " -p tcp"; # we'll add the '-p udp' to 2nd rule later
+      } else {
+        $rule_str .= " -p $str";
+      }
     }
 
     my $to_dst = "";
@@ -363,7 +389,7 @@ sub rule_str {
     if (defined($self->{_inside_addr}->{_port})) {
       if (!$can_use_port) {
         return ("ports can only be specified when protocol is \"tcp\" "
-		. "or \"udp\" (currently \"$self->{_proto}\")", undef);
+		. "\"udp\" or \"tcp_udp\" (currently \"$self->{_proto}\")", undef);
       }
       if ($use_netmap) {
 	return ("Cannot use ports with an IPv4net type outside-address as it " 
@@ -379,10 +405,19 @@ sub rule_str {
 	($success, $err) = Vyatta::Misc::isValidPortNumber($port);
         return ($err, undef) if (!defined($success));
       } else {
-	($success, $err) = Vyatta::Misc::isValidPortName($port);
-        return ($err, undef) if (!defined($success));
-	$port = getservbyname($port, $self->{_proto});
+        if ($self->{_proto} eq 'tcp_udp') {
+  ($success, $err) = Vyatta::Misc::isValidPortName($port, 'tcp');
+        return ($err, undef) if !defined $success ;
+  ($success, $err) = Vyatta::Misc::isValidPortName($port, 'udp');
+        return ($err, undef) if !defined $success ;
+        $port = getservbyname($port, 'tcp');
+        } else {
+  ($success, $err) = Vyatta::Misc::isValidPortName($port, $self->{_proto});
+        return ($err, undef) if !defined $success ;
+        $port = getservbyname($port, $self->{_proto});
+        }
       }
+      $to_dst = " --to-destination " if $to_dst eq "";
       $to_dst .= ":$port";
     }
     
@@ -474,17 +509,39 @@ sub rule_str {
 
   return (undef, undef) if defined $self->{_disable};
   
-  $rule_str .= " $src_str $dst_str";
+  my $comment = "\"NAT-$self->{_rule_number}\" ";
+  if ($tcp_and_udp == 1) {
+    $comment = "\"NAT-$self->{_rule_number} tcp_udp\" ";
+  }
+  $rule_str .= " $src_str $dst_str" . " -m comment --comment " . $comment;
   if ("$self->{_log}" eq "enable") {
-    my $log_rule   = $rule_str;
     my $rule_num = $self->{_rule_number};
     my $log_prefix = get_log_prefix($rule_num, $jump_target);
-    $log_rule     .= " -j LOG --log-prefix \"$log_prefix\" ";
-    $rule_str     .= " -j $jump_target $jump_param";
-    return (undef, $log_rule, $rule_str);
+    if ($tcp_and_udp == 1) {
+      my $tcp_log_rule = $rule_str;
+      $tcp_log_rule .= " -j LOG --log-prefix \"$log_prefix\" ";
+      my $udp_log_rule = $tcp_log_rule;
+      $udp_log_rule =~ s/ \-p tcp / -p udp /;
+      $rule_str .= " -j $jump_target $jump_param";
+      my $udp_rule_str = $rule_str;
+      $udp_rule_str =~ s/ \-p tcp / -p udp /;
+      return (undef, $tcp_log_rule, $rule_str, $udp_log_rule, $udp_rule_str);      
+    } else {
+      my $log_rule   = $rule_str;
+      $log_rule     .= " -j LOG --log-prefix \"$log_prefix\" ";
+      $rule_str     .= " -j $jump_target $jump_param";
+      return (undef, $log_rule, $rule_str);
+    }
   } else {
     $rule_str .= " -j $jump_target $jump_param";
-    return (undef, $rule_str);
+    if ($tcp_and_udp == 1) { 
+      # protocol is 'tcp_udp'; make another rule for protocol 'udp'
+      my $udp_rule_str = $rule_str;  
+      $udp_rule_str =~ s/ \-p tcp / -p udp /;
+      return (undef, $rule_str, $udp_rule_str);
+    } else {
+      return (undef, $rule_str);
+    }
   }
 }
 

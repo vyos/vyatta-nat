@@ -21,6 +21,8 @@ my %stats = (
             );
 open(STATS, "sudo /sbin/iptables -t nat -L -vn |") or exit 1;
 my $skey = "";
+my ($rule_tcp_pkts, $rule_tcp_bytes, $rule_pkts, $rule_bytes);
+my $tcp_done = 0;
 while (<STATS>) {
   if (m/^Chain PREROUTING/) {
     $skey = "destination";
@@ -32,7 +34,21 @@ while (<STATS>) {
 
   if ($skey ne "" && (m/SNAT/ || m/DNAT/ || m/MASQUERADE/ || m/RETURN/ || m/NETMAP/)) {
     m/^\s*(\d+[KMG]?)\s+(\d+[KMG]?)\s/;
-    push @{$stats{$skey}}, ($1, $2);
+    $rule_pkts = $1;
+    $rule_bytes = $2;
+    if (m/tcp_udp/) { # protocol is tcp_udp, 2 rules in iptables for it
+      if ($tcp_done == 0) {
+        $rule_tcp_pkts = $rule_pkts;
+        $rule_tcp_bytes = $rule_bytes;
+        $tcp_done = 1;
+        next;
+      } else {
+        $rule_pkts += $rule_tcp_pkts;
+        $rule_bytes += $rule_tcp_bytes;
+        $tcp_done = 0;
+      }
+    }
+    push @{$stats{$skey}}, ($rule_pkts, $rule_bytes);
   }
 }
 close STATS;
