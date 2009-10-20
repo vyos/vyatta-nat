@@ -1,3 +1,9 @@
+vyatta-nat (0.12.10) unstable; urgency=low
+
+  * pushed priority to node.def
+
+ -- slioch <slioch@eng-140.vyatta.com>  Tue, 20 Oct 2009 16:14:26 -0700
+
 vyatta-nat (0.12.9) unstable; urgency=low
 
   * * Fix Bug 1445 - Allow setting protocols tcp and udp in one rule
