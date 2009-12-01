@@ -1,3 +1,9 @@
+vyatta-nat (0.12.12) unstable; urgency=low
+
+  * added required keyword to help text.
+
+ -- Michael Larson <slioch@slioch.vyatta.com>  Mon, 30 Nov 2009 16:35:38 -0800
+
 vyatta-nat (0.12.11) unstable; urgency=low
 
   * dependency update
