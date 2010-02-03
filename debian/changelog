@@ -1,3 +1,10 @@
+vyatta-nat (0.12.13) unstable; urgency=low
+
+  * partial fix for bug 4115 'clear nat translations' does not clear nat
+    translations
+
+ -- Mohit Mehta <mohit.mehta@vyatta.com>  Tue, 02 Feb 2010 16:46:34 -0800
+
 vyatta-nat (0.12.12) unstable; urgency=low
 
   * added required keyword to help text.
