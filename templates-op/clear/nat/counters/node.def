@@ -1,2 +1,2 @@
 help: Clear NAT counters
-run: sudo /sbin/iptables -Z -t nat
+run: /opt/vyatta/sbin/vyatta-clear-nat-counters.pl --clirule=all
