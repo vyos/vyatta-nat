@@ -1,2 +1,0 @@
-help: Clear NAT translations
-run: sudo ${vyatta_bindir}/sudo-users/vyatta-clear-nat

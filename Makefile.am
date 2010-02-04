@@ -10,8 +10,7 @@ sbin_SCRIPTS += scripts/vyatta-show-nat.pl
 sbin_SCRIPTS += scripts/vyatta-show-nat-rules.pl
 sbin_SCRIPTS += scripts/vyatta-clear-nat-counters.pl
 
-bin_sudo_users_SCRIPTS  = scripts/vyatta-clear-nat
-bin_sudo_users_SCRIPTS += scripts/vyatta-nat-translations.pl
+bin_sudo_users_SCRIPTS = scripts/vyatta-nat-translations.pl
 
 share_perl5_DATA = lib/Vyatta/NatRule.pm
 curver_DATA = cfg-version/nat@3

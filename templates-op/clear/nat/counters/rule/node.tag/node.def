@@ -1,3 +1,3 @@
 help: Clear counters for a specific NAT rule
-allowed: ls /opt/vyatta/config/active/service/nat/rule/ 2>/dev/null
-run: /opt/vyatta/sbin/vyatta-clear-nat-counters.pl --clirule="$5"
+allowed: /opt/vyatta/sbin/vyatta-clear-nat-counters.pl --action=print-nat-rules --clirule=all
+run: /opt/vyatta/sbin/vyatta-clear-nat-counters.pl --action=clear-counters --clirule="$5"

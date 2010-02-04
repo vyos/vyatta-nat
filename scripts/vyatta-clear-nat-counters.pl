@@ -35,6 +35,22 @@ my %chain_hash = ( 'source'        => 'POSTROUTING',
                    'destination'   => 'PREROUTING',
                    'masquerade'    => 'POSTROUTING');
 
+sub numerically { $a <=> $b; }
+
+sub get_nat_rules {
+  my $config = new Vyatta::Config;
+  $config->setLevel("service nat rule");
+  my @rules = sort numerically $config->listOrigNodes();
+  return @rules;
+}
+
+sub print_nat_rules {
+  my @rules = get_nat_rules();
+  my $rule_string = join(" ",@rules);
+  print $rule_string;
+  return;
+}
+
 sub clear_rule {
   my $clirule = shift;
   my $error = undef;
@@ -45,14 +61,19 @@ sub clear_rule {
     return "error clearing NAT rule counters" if $error;
   } else {
     # clear counters for a specific NAT rule
-    my $config = new Vyatta::Config;
-    $config->setLevel("service nat rule");
-    my @rules = $config->listOrigNodes();
+    my @rules = get_nat_rules();
 
     # validate that it's a legit CLI rule
     if (!((scalar(grep(/^$clirule$/, @rules)) > 0))) {
       return "Invalid NAT rule number \"$clirule\"";
     }
+
+    my $config = new Vyatta::Config;
+    $config->setLevel("service nat rule");
+
+    # make sure rule is enabled
+    my $is_rule_disabled = $config->existsOrig("$clirule disable");
+    return "NAT rule $clirule is disabled" if defined $is_rule_disabled;
 
     # determine rule type
     my $rule_type = $config->returnOrigValue("$clirule type");
@@ -77,14 +98,19 @@ sub clear_rule {
 # main
 #
 
-my ($clirulenum);
-GetOptions("clirule=s" => \$clirulenum);
+my ($action, $clirulenum);
 
+GetOptions( "action=s"  => \$action,
+            "clirule=s" => \$clirulenum);
+
+die "undefined action" if ! defined $action;
 die "undefined rule number" if ! defined $clirulenum;
 
 my ($error, $warning);
 
-($error, $warning) = clear_rule($clirulenum);
+($error, $warning) = clear_rule($clirulenum) if $action eq 'clear-counters';
+
+($error, $warning) = print_nat_rules() if $action eq 'print-nat-rules';
 
 if (defined $warning) {
     print "$warning\n";
