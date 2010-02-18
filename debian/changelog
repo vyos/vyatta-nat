@@ -1,3 +1,9 @@
+vyatta-nat (0.12.14+kenwood1) unstable; urgency=low
+
+  * UNRELEASED
+
+ -- An-Cheng Huang <ancheng@vyatta.com>  Wed, 17 Feb 2010 16:08:05 -0800
+
 vyatta-nat (0.12.14) unstable; urgency=low
 
   * fix bug 4115 'clear nat translations' does not clear nat
