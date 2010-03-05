@@ -9,19 +9,20 @@ sub numerically { $a <=> $b; }
 
 sub raw_cleanup {
   # remove the conntrack setup.
-  my @lines
-    = `iptables -t raw -L PREROUTING -vn --line-numbers | egrep ^[0-9]`;
-  foreach (@lines) {
-    my ($num, $ignore, $ignore, $chain, $ignore, $ignore, $in, $out,
-        $ignore, $ignore) = split /\s+/;
-    if ($chain eq "NAT_CONNTRACK") {
-      system("iptables -t raw -D PREROUTING $num");
-      system("iptables -t raw -D OUTPUT $num");
-      system("iptables -t raw -F NAT_CONNTRACK");
-      system("iptables -t raw -X NAT_CONNTRACK");
-      last;
+  my @lines;
+  foreach my $label ('PREROUTING', 'OUTPUT') {
+    @lines = `iptables -t raw -L $label -vn --line-numbers | egrep ^[0-9]`;
+    foreach (@lines) {
+      my ($num, $ignore, $ignore, $chain, $ignore, $ignore, $in, $out,
+          $ignore, $ignore) = split /\s+/;
+      if ($chain eq "NAT_CONNTRACK") {
+        system("iptables -t raw -D $label $num");
+        last;
+      }
     }
   }
+  system("iptables -t raw -F NAT_CONNTRACK");
+  system("iptables -t raw -X NAT_CONNTRACK");
 }
 
 my $config = new Vyatta::Config;
