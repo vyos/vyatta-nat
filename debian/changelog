@@ -1,3 +1,9 @@
+vyatta-nat (0.12.14+kenwood2) unstable; urgency=low
+
+  * Fix nat conntrack teardown.
+
+ -- Stig Thormodsrud <stig@vyatta.com>  Wed, 10 Mar 2010 16:45:17 -0800
+
 vyatta-nat (0.12.14+kenwood1) unstable; urgency=low
 
   * UNRELEASED
