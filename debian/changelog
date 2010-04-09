@@ -1,3 +1,9 @@
+vyatta-nat (0.12.17) unstable; urgency=low
+
+  * Change DNAT to use index 2 to skip over VYATTA_PRE_DNAT_HOOK.
+
+ -- Stig Thormodsrud <stig@vyatta.com>  Fri, 09 Apr 2010 14:57:49 -0700
+
 vyatta-nat (0.12.16) unstable; urgency=low
 
   * Fix nat conntrack teardown.
