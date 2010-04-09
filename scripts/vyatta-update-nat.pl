@@ -37,7 +37,7 @@ if ($debug) {
 }
 my %ipt_rulenum = (
                     source      => 2,
-                    destination => 1,
+                    destination => 2,
                   );
 my %chain_name = (
                   source      => "POSTROUTING",
