@@ -1,3 +1,9 @@
+vyatta-nat (0.12.18) unstable; urgency=low
+
+  * use "existing-interfaces" for enumeration
+
+ -- An-Cheng Huang <ancheng@vyatta.com>  Fri, 14 May 2010 17:42:00 -0700
+
 vyatta-nat (0.12.17) unstable; urgency=low
 
   * Change DNAT to use index 2 to skip over VYATTA_PRE_DNAT_HOOK.
