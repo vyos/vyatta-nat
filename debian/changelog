@@ -1,3 +1,9 @@
+vyatta-nat (0.12.19) unstable; urgency=low
+
+  * Fix 5574: NAT Rule number maximum 1024 needs to be increased
+
+ -- Stig Thormodsrud <stig@vyatta.com>  Fri, 21 May 2010 17:49:01 -0700
+
 vyatta-nat (0.12.18) unstable; urgency=low
 
   * use "existing-interfaces" for enumeration
