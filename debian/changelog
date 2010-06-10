@@ -1,3 +1,9 @@
+vyatta-nat (0.12.21) unstable; urgency=low
+
+  * start fresh for each conntrack call
+
+ -- Mohit Mehta <mohit.mehta@vyatta.com>  Thu, 10 Jun 2010 13:52:27 -0700
+
 vyatta-nat (0.12.20) unstable; urgency=low
 
   * * make 'show nat translations' cmnds work with conntrack-tools
