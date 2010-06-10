@@ -1,3 +1,10 @@
+vyatta-nat (0.12.20) unstable; urgency=low
+
+  * * make 'show nat translations' cmnds work with conntrack-tools
+    0.9.14
+
+ -- Mohit Mehta <mohit.mehta@vyatta.com>  Thu, 10 Jun 2010 11:39:48 -0700
+
 vyatta-nat (0.12.19) unstable; urgency=low
 
   * Fix 5574: NAT Rule number maximum 1024 needs to be increased
