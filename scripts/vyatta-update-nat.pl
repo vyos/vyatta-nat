@@ -4,25 +4,13 @@ use strict;
 use lib "/opt/vyatta/share/perl5/";
 use Vyatta::Config;
 use Vyatta::NatRule;
+use Vyatta::IpTables::Mgr;
 
 sub numerically { $a <=> $b; }
 
 sub raw_cleanup {
   # remove the conntrack setup.
-  my @lines;
-  foreach my $label ('PREROUTING', 'OUTPUT') {
-    @lines = `iptables -t raw -L $label -vn --line-numbers | egrep ^[0-9]`;
-    foreach (@lines) {
-      my ($num, $ignore, $ignore, $chain, $ignore, $ignore, $in, $out,
-          $ignore, $ignore) = split /\s+/;
-      if ($chain eq "NAT_CONNTRACK") {
-        system("iptables -t raw -D $label $num");
-        last;
-      }
-    }
-  }
-  system("iptables -t raw -F NAT_CONNTRACK");
-  system("iptables -t raw -X NAT_CONNTRACK");
+  ipt_disable_conntrack('iptables', 'NAT_CONNTRACK');
 }
 
 my $config = new Vyatta::Config;
@@ -47,7 +35,6 @@ print OUT "========= nat list =========\n";
 my @rule_keys = sort numerically keys %rules;
 if ($#rule_keys < 0) {
   raw_cleanup();
- 
   exit 0;
 }
 
@@ -56,17 +43,7 @@ if ($#rule_keys < 0) {
 system("iptables -t nat -L -n >& /dev/null");
 
 # we have some nat rule(s). make sure conntrack is enabled.
-system("iptables -t raw -L NAT_CONNTRACK -n >& /dev/null");
-if ($? >> 8) {
-  # NAT_CONNTRACK chain does not exist yet. set up conntrack.
-  system("iptables -t raw -N NAT_CONNTRACK");
-  # this enables conntrack for all packets. potentially we can add more rules
-  # to the NAT_CONNTRACK chain for finer-grained control over which packets
-  # are tracked.
-  system("iptables -t raw -A NAT_CONNTRACK -j ACCEPT");
-  system("iptables -t raw -I PREROUTING 1 -j NAT_CONNTRACK");
-  system("iptables -t raw -I OUTPUT 1 -j NAT_CONNTRACK");
-}
+ipt_enable_conntrack('iptables', 'NAT_CONNTRACK');
 
 my $all_deleted = 1;
 for $rule (@rule_keys) {
