@@ -246,8 +246,9 @@ if (defined $xml_file) {
 	} 
 	$xml = `sudo $conntrack -L -n $ipopt -o xml $proto 2>/dev/null`;
 	chomp $xml;
+	$data = undef;
 	$data = $xs->XMLin($xml) if ! $xml eq '';
-	nat_print_xml($data, 'snat');	
+	nat_print_xml($data, 'snat') if defined $data;	
     }
     if ($mode eq 'both' or $mode eq 'dnat') {
 	my $ipopt = "";
@@ -256,8 +257,9 @@ if (defined $xml_file) {
 	} 
 	$xml = `sudo $conntrack -L -g $ipopt -o xml $proto 2>/dev/null`;
 	chomp $xml;
+	$data = undef;
 	$data = $xs->XMLin($xml) if ! $xml eq '';
-	nat_print_xml($data, 'dnat');	
+	nat_print_xml($data, 'dnat') if defined $data;	
     }
 }
 
