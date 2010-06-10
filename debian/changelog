@@ -1,3 +1,9 @@
+vyatta-nat (0.12.22) unstable; urgency=low
+
+  * Change nat to use IpTables::Mgr to enable/disable conntrack.
+
+ -- Stig Thormodsrud <stig@vyatta.com>  Thu, 10 Jun 2010 15:07:08 -0700
+
 vyatta-nat (0.12.21) unstable; urgency=low
 
   * start fresh for each conntrack call
