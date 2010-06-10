@@ -37,13 +37,13 @@ my $mode;
 my $verbose_format = "%-20s %-18s %-20s %-18s\n";
 my $format         = "%-20s %-20s %-4s  %-4s  %-8s";
 
-
 sub add_xml_root {
     my $xml = shift;
 
     $xml = '<data>' . $xml . '</data>';
     return $xml;
 }
+
 
 sub read_xml_file {
     my $file = shift;
@@ -52,7 +52,6 @@ sub read_xml_file {
     open FD, "<", $file or die "Couldn't open $file\n";
     my $xml = <FD>;
     close FD;
-    $xml = add_xml_root($xml);
     return $xml;
 }
 
@@ -227,6 +226,8 @@ if (defined $xml_file) {
 
 } elsif (defined $pipe) {
     while ($xml = <STDIN>) {
+	$xml =~ s/\<\?xml version=\"1\.0\" encoding=\"utf-8\"\?\>//;
+	$xml =~ s/\<conntrack\>//;
 	$xml = add_xml_root($xml);
 	$data = $xs->XMLin($xml);
 	nat_print_xml($data, $mode);
@@ -243,9 +244,9 @@ if (defined $xml_file) {
 	if (defined $ipaddr) {
 	    $ipopt = "--orig-src $ipaddr";
 	} 
-	$xml = `sudo $conntrack -L -n $ipopt -o xml $proto`;
-	my $snat_xml = add_xml_root($xml);
-	$data = $xs->XMLin($snat_xml);
+	$xml = `sudo $conntrack -L -n $ipopt -o xml $proto 2>/dev/null`;
+	chomp $xml;
+	$data = $xs->XMLin($xml) if ! $xml eq '';
 	nat_print_xml($data, 'snat');	
     }
     if ($mode eq 'both' or $mode eq 'dnat') {
@@ -253,9 +254,9 @@ if (defined $xml_file) {
 	if (defined $ipaddr) {
 	    $ipopt = "--orig-dst $ipaddr";
 	} 
-	$xml = `sudo $conntrack -L -g $ipopt -o xml $proto`;
-	my $dnat_xml = add_xml_root($xml);
-	$data = $xs->XMLin($dnat_xml);
+	$xml = `sudo $conntrack -L -g $ipopt -o xml $proto 2>/dev/null`;
+	chomp $xml;
+	$data = $xs->XMLin($xml) if ! $xml eq '';
 	nat_print_xml($data, 'dnat');	
     }
 }
