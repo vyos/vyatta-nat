@@ -1,6 +1,6 @@
 type:  txt
 
-help: Protocol to NAT (this can be a protocol name in /etc/protocols, a protocol number, or "all")
+help: Protocol to NAT 
 
 val_help: txt ; IP protocol name from /etc/protocols (e.g. "tcp" or "udp")
 val_help: u32:0-255 ; IP protocol number
