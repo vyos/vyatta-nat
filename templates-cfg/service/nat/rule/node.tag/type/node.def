@@ -1,5 +1,5 @@
 type:  txt
-help: Set source, destination, or masquerade NAT [REQUIRED]
+help: Type of NAT (source, destination, or masquerade) [REQUIRED]
 syntax:expression: $VAR(@) in "source", "destination", "masquerade"; "invalid type $VAR(@)"
 comp_help:Possible completions:
   source        Source NAT

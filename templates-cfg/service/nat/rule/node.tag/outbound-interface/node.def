@@ -1,5 +1,5 @@
 type:  txt
-help: Set outbound interface for NAT traffic
+help: Outbound interface for NAT traffic
 enumeration: existing-interfaces
 comp_help:Enter a network interface name, for example, "eth0"
 commit:expression: exec "

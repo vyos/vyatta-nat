@@ -1,5 +1,5 @@
 type: txt
-help: Set outside IP address or range for NAT
+help: Outside IP address or range for NAT
 comp_help: Possible completions:
   <x.x.x.x>                  NAT to the specified IP address
   <x.x.x.x>-<x.x.x.x>        NAT to the specified IP range

@@ -1,5 +1,5 @@
 type:  txt
-help: Set protocol to NAT (this can be a protocol name in /etc/protocols, a protocol number, or "all")
+help: Protocol to NAT (this can be a protocol name in /etc/protocols, a protocol number, or "all")
 comp_help:Possible completions:
   <text>        An IP protocol name from /etc/protocols (e.g. "tcp" or "udp")
   <0-255>       An IP protocol number
