@@ -1,3 +1,10 @@
+vyatta-nat (0.12.24) unstable; urgency=low
+
+  * Clean up helps strings for NAT.
+  * Change comp_help to val_help.
+
+ -- Stig Thormodsrud <stig@vyatta.com>  Tue, 20 Jul 2010 17:25:28 -0700
+
 vyatta-nat (0.12.23) unstable; urgency=low
 
   * up NAT priority to being right after firewall as done in Jenner -
