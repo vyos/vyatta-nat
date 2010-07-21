@@ -1,6 +1,7 @@
 type: txt
+
 help: Inside IP address or range for NAT
-comp_help: Possible completions:
-  <x.x.x.x>                  NAT to the specified IP address
-  <x.x.x.x>-<x.x.x.x>        NAT to the specified IP range
-  <x.x.x.x/x>                NAT to the specified network address. Host part of the address will remain unchanged
+
+val_help: ipv4 ; NAT to the specified IP address
+val_help: <x.x.x.x>-<x.x.x.x> ; NAT to the specified IP range
+val_help: ipv4net ; NAT to the specified network address. Host part of the address will remain unchanged

@@ -1,5 +1,6 @@
 type: txt
+
 help: Outside port
-comp_help: The outside port can be one of the following:
-  <1-65535>             Numbered port (between 1 and 65535)
-  <start>-<end>         Numbered port range (e.g., 1001-1005)
+
+val_help: u32:1-65535 ; Numbered port
+val_help: <start>-<end> ; Numbered port range (e.g., 1001-1005)
