@@ -1,3 +1,9 @@
+vyatta-nat (0.12.25) unstable; urgency=low
+
+  * Convert to using new ipv4range and negatates.
+
+ -- Stig Thormodsrud <stig@vyatta.com>  Wed, 21 Jul 2010 10:48:36 -0700
+
 vyatta-nat (0.12.24) unstable; urgency=low
 
   * Clean up helps strings for NAT.
