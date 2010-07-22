@@ -1,3 +1,10 @@
+vyatta-nat (0.12.26) unstable; urgency=low
+
+  * Use comp_help to give back info that was removed in prior val_help
+    commit.
+
+ -- Stig Thormodsrud <stig@vyatta.com>  Wed, 21 Jul 2010 17:07:43 -0700
+
 vyatta-nat (0.12.25) unstable; urgency=low
 
   * Convert to using new ipv4range and negatates.
