@@ -1,3 +1,9 @@
+vyatta-nat (0.12.27) unstable; urgency=low
+
+  * UNRELEASED
+
+ -- An-Cheng Huang <ancheng@vyatta.com>  Thu, 22 Jul 2010 17:24:51 -0700
+
 vyatta-nat (0.12.26) unstable; urgency=low
 
   * Use comp_help to give back info that was removed in prior val_help
