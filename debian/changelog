@@ -1,3 +1,9 @@
+vyatta-nat (0.12.29) unstable; urgency=low
+
+  * UNRELEASED
+
+ -- An-Cheng Huang <ancheng@vyatta.com>  Thu, 02 Sep 2010 18:29:34 -0700
+
 vyatta-nat (0.12.28) unstable; urgency=low
 
   * update help text to use val_help
