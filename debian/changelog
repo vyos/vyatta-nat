@@ -1,3 +1,10 @@
+vyatta-nat (0.12.30) unstable; urgency=low
+
+  * remove linda override
+  * update gitignore rules
+
+ -- Stephen Hemminger <stephen.hemminger@vyatta.com>  Fri, 26 Nov 2010 11:12:07 -0800
+
 vyatta-nat (0.12.29) unstable; urgency=low
 
   * UNRELEASED
