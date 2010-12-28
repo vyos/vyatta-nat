@@ -1,3 +1,9 @@
+vyatta-nat (0.12.30+mendocino1) unstable; urgency=low
+
+  * new branch
+
+ -- An-Cheng Huang <ancheng@vyatta.com>  Tue, 28 Dec 2010 20:38:11 +0000
+
 vyatta-nat (0.12.30) unstable; urgency=low
 
   * remove linda override
