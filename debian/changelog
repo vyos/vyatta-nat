@@ -1,3 +1,9 @@
+vyatta-nat (0.12.32) unstable; urgency=low
+
+  * new branch
+
+ -- Deepti Kulkarni <deepti@vyatta.com>  Thu, 07 Jul 2011 20:57:29 -0700
+
 vyatta-nat (0.12.31) unstable; urgency=low
 
   * new branch
