@@ -1,10 +1,36 @@
 #!/usr/bin/perl
+#
+# Module: vyatta-update-nat.pl
+#
+# **** License ****
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 2 as
+# published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# This code was originally developed by Vyatta, Inc.
+# Portions created by Vyatta are Copyright (C) 2009 Vyatta, Inc.
+# All Rights Reserved.
+#
+# Author: eng@vyatta.com
+# Date: 2009
+# Description: Script to generate output for "show nat rules" command
+#
+# **** End License ****
+#
 
 use strict;
 use lib "/opt/vyatta/share/perl5/";
 use Vyatta::Config;
 use Vyatta::NatRule;
 use Vyatta::IpTables::Mgr;
+
+my $CONFIG_LEVEL = "nat";
+my $IPTABLES = "/sbin/iptables";
 
 sub numerically { $a <=> $b; }
 
@@ -14,7 +40,7 @@ sub raw_cleanup {
 }
 
 my $config = new Vyatta::Config;
-$config->setLevel("service nat rule");
+$config->setLevel($CONFIG_LEVEL." rule");
 my %rules = $config->listNodeStatus();
 my $rule;
 my $debug = 0;
@@ -40,7 +66,7 @@ if ($#rule_keys < 0) {
 
 ## it seems that "multiport" does not like port range (p1:p2) if nobody has
 ## touched the nat table yet after reboot!?
-system("iptables -t nat -L -n >& /dev/null");
+system("$IPTABLES -t nat -L -n >& /dev/null");
 
 # we have some nat rule(s). make sure conntrack is enabled.
 ipt_enable_conntrack('iptables', 'NAT_CONNTRACK');
@@ -51,7 +77,7 @@ for $rule (@rule_keys) {
   my $tmp = `iptables -L -nv --line -t nat`;
   print OUT "iptables before:\n$tmp\n";
   my $nrule = new Vyatta::NatRule;
-  $nrule->setup("service nat rule $rule");
+  $nrule->setup($CONFIG_LEVEL." rule $rule");
   my $otype = $nrule->orig_type();
   my $ntype = $nrule->new_type();
   if ((defined($otype) && $otype ne "source" && $otype ne "destination")
@@ -78,10 +104,10 @@ for $rule (@rule_keys) {
       exit 4;
     }
     my $orule = new Vyatta::NatRule;
-    $orule->setupOrig("service nat rule $rule");
+    $orule->setupOrig($CONFIG_LEVEL." rule $rule");
     my $ipt_rules = $orule->get_num_ipt_rules();
     for (1 .. $ipt_rules) {
-      $cmd = "iptables -t nat -D $chain_name{$otype} $ipt_rulenum{$otype}";
+      $cmd = "$IPTABLES -t nat -D $chain_name{$otype} $ipt_rulenum{$otype}";
       print OUT "$cmd\n";
       if (system($cmd)) {
         exit 1;
@@ -105,7 +131,7 @@ for $rule (@rule_keys) {
     }
     foreach my $rule_str (@rule_strs) {
       next if !defined $rule_str;
-      $cmd = "iptables -t nat -I $chain_name{$ntype} $ipt_rulenum{$ntype} " .
+      $cmd = "$IPTABLES -t nat -I $chain_name{$ntype} $ipt_rulenum{$ntype} " .
           "$rule_str";
       print OUT "$cmd\n";
       if (system($cmd)) {
@@ -122,11 +148,11 @@ for $rule (@rule_keys) {
 
     # delete the old rule(s)
     my $orule = new Vyatta::NatRule;
-    $orule->setupOrig("service nat rule $rule");
+    $orule->setupOrig($CONFIG_LEVEL." rule $rule");
     my $ipt_rules = $orule->get_num_ipt_rules();
     my $idx = $ipt_rulenum{$otype};
     for (1 .. $ipt_rules) {
-      $cmd = "iptables -t nat -D $chain_name{$otype} $idx";
+      $cmd = "$IPTABLES -t nat -D $chain_name{$otype} $idx";
       print OUT "$cmd\n";
       if (system($cmd)) {
         exit 1;
@@ -136,7 +162,7 @@ for $rule (@rule_keys) {
     # add the new rule(s)
     foreach my $rule_str (@rule_strs) {
       next if !defined $rule_str;
-      $cmd = "iptables -t nat -I $chain_name{$ntype} $ipt_rulenum{$ntype} " .
+      $cmd = "$IPTABLES -t nat -I $chain_name{$ntype} $ipt_rulenum{$ntype} " .
           "$rule_str";
       print OUT "$cmd\n";
       if (system($cmd)) {
