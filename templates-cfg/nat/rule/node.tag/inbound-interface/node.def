@@ -2,11 +2,14 @@ type:  txt
 
 help: Inbound interface of NAT traffic
 
-enumeration: existing-interfaces
+enumeration: existing-interfaces; echo "any"
 
-val_help: <interface> ; Interface name
+val_help: <interface> ; Interface name or "any"
 
 commit:expression: exec "
+        if [ \"any\" == \"$VAR(@)\" ] ; then
+            exit 0
+        fi
         intf_array=($(awk '$1 ~ /:/ { print $1 }' /proc/net/dev))
         intf_array_len=${#intf_array[*]}
         i=0
