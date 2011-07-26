@@ -13,7 +13,7 @@ sbin_SCRIPTS += scripts/vyatta-clear-nat-counters.pl
 bin_sudo_users_SCRIPTS = scripts/vyatta-nat-translations.pl
 
 share_perl5_DATA = lib/Vyatta/NatRule.pm
-curver_DATA = cfg-version/nat@3
+curver_DATA = cfg-version/nat@4
 
 cpiop = find  . ! -regex '\(.*~\|.*\.bak\|.*\.swp\|.*\#.*\#\)' -print0 | \
 	cpio -0pd
