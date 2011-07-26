@@ -221,7 +221,9 @@ sub rule_str {
       $jump_target = 'SNAT';
     }
     if (defined($self->{_outbound_if})) {
-      $rule_str .= " -o $self->{_outbound_if}";
+      if ($self->{_outbound_if} ne "any") {
+        $rule_str .= " -o $self->{_outbound_if}";
+      }
     } else {
       # "masquerade" requires outbound_if.
       # also make this a requirement for "source" to prevent users from
@@ -342,7 +344,9 @@ sub rule_str {
     }
   
     if (defined($self->{_inbound_if})) {
-      $rule_str .= " -i $self->{_inbound_if}";
+      if ($self->{_inbound_if} ne "any") {
+        $rule_str .= " -i $self->{_inbound_if}";
+      }
     } else {
       # make this a requirement to prevent users from
       # inadvertently NATing loopback traffic.
