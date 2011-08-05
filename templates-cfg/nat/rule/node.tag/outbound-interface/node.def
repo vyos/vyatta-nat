@@ -20,4 +20,11 @@ commit:expression: exec "
              fi
              let i++
         done
+        intf_group_name_array=\"eth+ bond+ br+ peth+ vtun+ tun+ wlm+ wlan+\"
+        i=0
+        for i in $intf_group_name_array; do
+          if [ \"$i\" == \"$VAR(@)\" ]; then
+            exit 0
+          fi
+        done
         echo NAT configuration warning: interface $VAR(@) does not exist on this system "
