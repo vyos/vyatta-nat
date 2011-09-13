@@ -1,0 +1,6 @@
+type: txt
+
+help: NAT rule logging
+
+syntax:expression: $VAR(@) in "enable", "disable"; \
+         "NAT logging must be enable or disable."
