@@ -1,9 +1,0 @@
-type:  txt
-
-help: Type of NAT [REQUIRED]
-
-syntax:expression: $VAR(@) in "source", "destination", "masquerade"; "invalid type $VAR(@)"
-
-val_help: source ; Source NAT
-val_help: destination ; Destination NAT
-val_help: masquerade ; Masquerade NAT
