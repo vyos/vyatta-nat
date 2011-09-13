@@ -18,7 +18,7 @@
 #
 # Author: eng@vyatta.com
 # Date: 2009
-# Description: Script to generate output for "show nat rules" command
+# Description: Script to update iptables NAT rules
 #
 # **** End License ****
 #
