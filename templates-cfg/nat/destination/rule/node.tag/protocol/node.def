@@ -1,0 +1,15 @@
+type:  txt
+
+help: Protocol to NAT 
+
+val_help: txt ; IP protocol name from /etc/protocols (e.g. "tcp" or "udp")
+val_help: u32:0-255 ; IP protocol number
+val_help: tcp_udp ; Both TCP and UDP
+val_help: all ; All IP protocols
+val_help: !<protocol> ; All IP protocols except for the specified name or number (negation)
+
+syntax:expression: exec "if [ -n \"`/opt/vyatta/sbin/vyatta-validate-type.pl protocol_negate '$VAR(@)'`\" ] \
+                        && [ \"$VAR(@)\" != 'tcp_udp' ]; then \
+        echo invalid protocol \"$VAR(@)\" ; \
+        exit 1 ; \
+     fi ; "
