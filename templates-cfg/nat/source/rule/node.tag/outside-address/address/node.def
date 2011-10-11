@@ -5,3 +5,4 @@ help: Outside IP address or range for NAT
 val_help: ipv4 ; NAT to the specified IP address
 val_help: ipv4range ; NAT to the specified IP range
 val_help: ipv4net ; NAT to the specified network address. Host part of the address will remain unchanged
+val_help: masquerade ; NAT to the primary address of outbound-interface
