@@ -1,1 +1,3 @@
 help: Source NAT settings
+
+end:expression: "sudo /opt/vyatta/sbin/vyatta-update-src-nat.pl"

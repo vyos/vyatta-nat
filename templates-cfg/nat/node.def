@@ -2,4 +2,4 @@ priority: 220
 
 help: Network Address Translation (NAT) parameters
 
-end:expression: "sudo /opt/vyatta/sbin/vyatta-update-nat.pl"
+#end:expression: "sudo /opt/vyatta/sbin/vyatta-update-dst-nat.pl"
