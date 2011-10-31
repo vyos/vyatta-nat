@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# Module: vyatta-update-nat.pl
+# Module: vyatta-update-dst-nat.pl
 #
 # **** License ****
 # This program is free software; you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 #
 # Author: eng@vyatta.com
 # Date: 2011
-# Description: Script to update iptables NAT rules
+# Description: Script to update iptables destination NAT rules
 #
 # **** End License ****
 #
