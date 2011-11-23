@@ -1,0 +1,6 @@
+type: txt
+
+help: Inside port
+
+val_help: u32:1-65535 ; Numbered port 
+val_help: <start>-<end> ; Numbered port range (e.g., 1001-1005)
