@@ -1,6 +1,6 @@
 type: txt
 
-help: Translated TCP/UDP port
+help: Translated port
 
 val_help: u32:1-65535 ; Numbered port 
 val_help: <start>-<end> ; Numbered port range (e.g., 1001-1005)
