@@ -80,7 +80,7 @@ sub setup {
   $self->{_log} = $config->returnValue("log");
 
   $self->{_inside_addr}->{_addr}
-    = $config->returnValue("inside-address address");
+    = $config->returnValue("translation address");
   $self->{_inside_addr}->{_range}->{_start} = undef;
   $self->{_inside_addr}->{_range}->{_stop} = undef;
   if (defined($self->{_inside_addr}->{_addr})
@@ -90,7 +90,7 @@ sub setup {
     $self->{_inside_addr}->{_addr} = undef;
   }
   $self->{_inside_addr}->{_port}
-    = $config->returnValue("inside-address port");
+    = $config->returnValue("translation port");
   $src->setup("$level source");
   $dst->setup("$level destination");
 
@@ -111,7 +111,7 @@ sub setupOrig {
   $self->{_log} = $config->returnOrigValue("log");
 
   $self->{_inside_addr}->{_addr}
-    = $config->returnOrigValue("inside-address address");
+    = $config->returnOrigValue("translation address");
   $self->{_inside_addr}->{_range}->{_start} = undef;
   $self->{_inside_addr}->{_range}->{_stop} = undef;
   if (defined($self->{_inside_addr}->{_addr})
@@ -121,7 +121,7 @@ sub setupOrig {
     $self->{_inside_addr}->{_addr} = undef;
   }
   $self->{_inside_addr}->{_port}
-    = $config->returnOrigValue("inside-address port");
+    = $config->returnOrigValue("translation port");
     
   $src->setupOrig("$level source");
   $dst->setupOrig("$level destination");

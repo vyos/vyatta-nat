@@ -79,7 +79,7 @@ sub setup {
   $self->{_log} = $config->returnValue("log");
   
   $self->{_outside_addr}->{_addr}
-    = $config->returnValue("outside-address address");
+    = $config->returnValue("translation address");
   if (defined($self->{_outside_addr}->{_addr}) && ($self->{_outside_addr}->{_addr} eq "masquerade")) {
     $self->{_is_masq} = 1;
   }
@@ -92,7 +92,7 @@ sub setup {
     $self->{_outside_addr}->{_addr} = undef;
   }
   $self->{_outside_addr}->{_port}
-    = $config->returnValue("outside-address port");
+    = $config->returnValue("translation port");
 
   $src->setup("$level source");
   $dst->setup("$level destination");
@@ -267,7 +267,7 @@ sub rule_str {
         }
       }
     } elsif (!defined($self->{_is_masq})) {
-      return ('outside-address not specified', undef);
+      return ('translation address not specified', undef);
     }
 
 
