@@ -1,6 +1,6 @@
 type: txt
 
-help: Inside IP address or range for NAT
+help: Translated IP address or range
 
 val_help: ipv4 ; NAT to the specified IP address
 val_help: ipv4range ; NAT to the specified IP range
