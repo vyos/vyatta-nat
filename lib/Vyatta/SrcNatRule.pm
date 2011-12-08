@@ -203,6 +203,10 @@ sub rule_str {
       } else {
          return ("\"$addr\" is not a valid IP address", undef)
          if (!Vyatta::TypeChecker::validateType('ipv4', $addr, 1));
+
+         print("Warning: IP address $addr does not exist on the system!\n")
+	     if !(is_local_address($addr));
+	     
          $to_src .= $addr;
       }
     } elsif (defined($self->{_outside_addr}->{_range}->{_start})
