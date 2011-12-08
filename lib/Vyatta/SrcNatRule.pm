@@ -114,7 +114,7 @@ sub setupOrig {
   $self->{_log} = $config->returnOrigValue("log");
   
   $self->{_outside_addr}->{_addr}
-    = $config->returnOrigValue("outside-address address");
+    = $config->returnOrigValue("translation address");
   if (defined($self->{_outside_addr}->{_addr}) && ($self->{_outside_addr}->{_addr} eq "masquerade")) {
     $self->{_is_masq} = 1;
   }
@@ -127,7 +127,7 @@ sub setupOrig {
     $self->{_outside_addr}->{_addr} = undef;
   }
   $self->{_outside_addr}->{_port}
-    = $config->returnOrigValue("outside-address port");
+    = $config->returnOrigValue("translation port");
 
   $src->setupOrig("$level source");
   $dst->setupOrig("$level destination");
@@ -188,13 +188,13 @@ sub rule_str {
     my $to_src = '';
     if (defined($self->{_outside_addr}->{_addr})) {
 
-      # Check outside-address
+      # Check translation address
       my $addr = $self->{_outside_addr}->{_addr};
       if (defined($self->{_is_masq})) {
         # It's masquerade rule, outside address will not be used anyway
         1;
       } elsif ($addr =~ m/\//) {
-         # Outside address is a probably x.x.x.x/y subnet thus it's a *-to-many rule
+         # Translation address is a probably x.x.x.x/y subnet thus it's a *-to-many rule
          # Target will be NETMAP
          return ("\"$addr\" is not a valid IPv4net address", undef)
          if (!Vyatta::TypeChecker::validateType('ipv4net', $addr, 1));
@@ -225,7 +225,7 @@ sub rule_str {
 		. "\"udp\" or \"tcp_udp\" (currently \"$self->{_proto}\")", undef);
       }
       if ($use_netmap) {
-        return ("Cannot use ports with an IPv4net type outside-address as it " . 
+        return ("Cannot use ports with an IPv4net type translation address as it " . 
                 "statically maps a whole network of addresses onto another " .
                 "network of addresses", undef);
       }
@@ -260,7 +260,7 @@ sub rule_str {
     }
     
     if ($self->{_exclude}) {
-      # outside-address has no effect for "exclude" rules
+      # translation address has no effect for "exclude" rules
     } elsif ($to_src ne '') {
       if (defined($self->{_is_masq})) {
         $jump_param .= " --to-ports $to_src";
@@ -298,8 +298,8 @@ sub rule_str {
   if ($use_netmap) {
 
     if (!defined $src->{_network}){
-      return ("\nsource address needs to be defined as a subnet with the same network prefix as outside-address" .
-              "\nwhen outside-address is defined with a prefix for static network mapping "
+      return ("\nsource address needs to be defined as a subnet with the same network prefix as translation address" .
+              "\nwhen translation address is defined with a prefix for static network mapping "
               , undef);
     }
 
@@ -309,13 +309,13 @@ sub rule_str {
     $src_addr_mask =~ s/.+\///;
 
     if (!($outside_addr_mask == $src_addr_mask)) {
-      return ("\nsource address should be a subnet with the same network prefix as outside-address" .
-              "\nwhen outside-address is defined with a prefix for static network mapping "
+      return ("\nsource address should be a subnet with the same network prefix as translation address" .
+              "\nwhen translation address is defined with a prefix for static network mapping "
               , undef);
     }
 
     if ($src->{_network} =~ /\!/) {
-      return ("\ncannot define a negated source address when outside-address" .
+      return ("\ncannot define a negated source address when translation address" .
               "\nis defined with a prefix for static network mapping "
               , undef);
 

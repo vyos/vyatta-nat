@@ -208,7 +208,7 @@ sub rule_str {
               . "\"udp\" or \"tcp_udp\" (currently \"$self->{_proto}\")", undef);
     }
     if ($use_netmap) {
-      return ("Cannot use ports with an IPv4net type outside-address as it "
+      return ("Cannot use ports with an IPv4net type translation address as it "
               . "statically maps a whole network of addresses onto another "
               . "network of addresses", undef);
     }
@@ -237,7 +237,7 @@ sub rule_str {
     $to_dst .= ":$port";
   }
   if ($self->{_exclude}) {
-    # inside-address has no effect for "exclude" rules
+    # translation address has no effect for "exclude" rules
   } elsif ($to_dst ne "") {
      if ($use_netmap) {
          # replace "DNAT" with "NETMAP"
@@ -247,7 +247,7 @@ sub rule_str {
            $jump_param .= " $to_dst";
        }
    } else {
-     return ("inside-address not specified", undef);
+     return ("translation address not specified", undef);
    }
    
   # source rule string
@@ -261,8 +261,8 @@ sub rule_str {
   
   if ($use_netmap) {
     if (!defined $dst->{_network}){
-      return ("\ndestination address needs to be defined as a subnet with the same network prefix as inside-address" .
-              "\nwhen inside-address is defined with a prefix for static network mapping "
+      return ("\ndestination address needs to be defined as a subnet with the same network prefix as translation address" .
+              "\nwhen translation address is defined with a prefix for static network mapping "
               , undef);
     }
 
@@ -271,13 +271,13 @@ sub rule_str {
     $inside_addr_mask =~ s/.+\///;
     $dst_addr_mask =~ s/.+\///;
        if (!($inside_addr_mask == $dst_addr_mask)) {
-        return ("\ndestination address should be a subnet with the same network prefix as inside-address" .
-                "\nwhen inside-address is defined with a prefix for static network mapping"
+        return ("\ndestination address should be a subnet with the same network prefix as translation address" .
+                "\nwhen translation address is defined with a prefix for static network mapping"
                 , undef);
       }
 
       if ($dst->{_network} =~ /\!/) {
-        return ("\ncannot define a negated destination address when inside-address" .
+        return ("\ncannot define a negated destination address when translation address" .
                 "\nis defined with a prefix for static network mapping "
                 , undef);
       }
