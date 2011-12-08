@@ -57,13 +57,15 @@ sub get_num_ipt_rules {
 }
 
 sub get_log_prefix {
-  my ($rule_num, $jump_target, $type) = @_;
+  my ($rule_num, $type, $modifier) = @_;
 
   # In iptables it allows a 29 character log_prefix, but we ideally
   # want to include "[nat-$type-$num-$target] "
   #                   4   4     4    7        = 19   
   # so no truncation is needed.
-  my $log_prefix  = "[NAT-$type-$rule_num-$jump_target] ";
+  my $log_prefix  = "[NAT-$type-$rule_num";
+  $log_prefix .= "-$modifier" if $modifier;
+  $log_prefix .= "] ";
   return $log_prefix;
 }
 

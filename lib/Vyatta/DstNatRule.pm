@@ -136,6 +136,7 @@ sub rule_str {
   my $can_use_port = 1;
   my $jump_target = '';
   my $jump_param  = '';
+  my $log_modifier = '';
   my $use_netmap = 0;
   my $tcp_and_udp = 0;
 
@@ -149,6 +150,7 @@ sub rule_str {
 
   if ($self->{_exclude}) {
     $jump_target = 'RETURN';
+    $log_modifier = 'EXCL';
   } else {
     $jump_target = 'DNAT';
   }
@@ -290,7 +292,7 @@ sub rule_str {
   $rule_str .= "$src_str $dst_str" . " -m comment --comment " . $comment;
   if ("$self->{_log}" eq "enable") {
     my $rule_num = $self->{_rule_number};
-    my $log_prefix = get_log_prefix($rule_num, $jump_target, $type);
+    my $log_prefix = get_log_prefix($rule_num, $type, $log_modifier);
     if ($tcp_and_udp == 1) {
       my $tcp_log_rule = $rule_str;
       $tcp_log_rule .= " -j LOG --log-prefix \"$log_prefix\" ";
