@@ -1,0 +1,2 @@
+help: Show configured source NAT rules
+run: /opt/vyatta/sbin/vyatta-show-nat-rules.pl --type=source

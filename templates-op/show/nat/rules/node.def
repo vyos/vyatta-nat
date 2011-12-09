@@ -1,2 +1,0 @@
-help: Show configured NAT rule set
-run: /opt/vyatta/sbin/vyatta-show-nat-rules.pl
