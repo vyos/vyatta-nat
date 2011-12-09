@@ -18,13 +18,14 @@
 #
 # Author: Mohit Mehta
 # Date: January 2009
-# Description: Script to generate output for "show nat rules" command
+# Description: Script to generate output for "show nat <source|destination> rules" commands
 #
 # **** End License ****
 #
 
 use strict;
 use Getopt::Long;
+use Text::Wrap qw(wrap 80 wrap);
 use lib "/opt/vyatta/share/perl5";
 use Vyatta::Config;
 use Vyatta::NatRuleCommon;
@@ -191,7 +192,7 @@ print_constants();
 for $rule (@rules) {
   my ($rulenum, $protocol, $interface, $source_addr, $source_port,
       $destination_addr, $destination_port, $translation_addr, $translation_port,
-      $translation_addr_str, $translation_port_str, $condition);
+      $translation_addr_str, $translation_port_str, $condition, $description);
   
   $rulenum = $rule;
   $protocol = "all";
@@ -215,6 +216,8 @@ for $rule (@rules) {
   $destination_addr = get_srcdst_address("$level $rule destination");
   $source_port = get_srcdst_port("$level $rule source");
   $destination_port = get_srcdst_port("$level $rule destination");
+
+  $description = $config->returnOrigValue("$rule description");
 
   if ($type eq 'source') {
       my $raw_translation_addr = get_inout_address("$level $rule", "_outside_addr");
@@ -247,7 +250,9 @@ for $rule (@rules) {
   print "\n";
   printf ($format2, $protocol, $translation_port_str);
   print "\n";
-  printf ($format1, "", "", "$condition\n") if $condition;
+  printf ($format1, "", "", "$condition") if $condition;
+  print "\n" if $condition;
+  print wrap("", "", "Desc: $description\n") if $description;
 }
 
 print "\n";
