@@ -247,8 +247,7 @@ for $rule (@rules) {
   print "\n";
   printf ($format2, $protocol, $translation_port_str);
   print "\n";
-  printf ($format1, "", "", $condition) if $condition ne "";
-  print "\n";
+  printf ($format1, "", "", "$condition\n") if $condition;
 }
 
 print "\n";
