@@ -23,14 +23,26 @@
 # **** End License ****
 #
 
+use strict;
+use Getopt::Long;
 use lib "/opt/vyatta/share/perl5";
 use Vyatta::Config;
-use Vyatta::NatRule;
+use Vyatta::NatRuleCommon;
+use Vyatta::SrcNatRule;
+use Vyatta::DstNatRule;
 use Vyatta::IpTables::AddressFilter;
 
-my $format1  = "%-5s  %-4s  %-7s  %-58s";
-my $format2  = "    %-16s  %-62s";
-%nat_type = ( "source" => SRC, "destination" => DST, "masquerade" => MASQ );
+my $type = undef;
+GetOptions(
+    "type=s" => \$type
+);
+
+my $src_level = "nat source rule";
+my $dst_level = "nat destination rule";
+my $level = undef;
+
+my $format1  = "%-5s  %-16s  %-58s";
+my $format2  = "       %-16s  %-62s";
 
 sub numerically { $a <=> $b; }
 
@@ -63,7 +75,9 @@ sub get_inout_port {
 
  my ($level, $inoroutaddr) = @_;
  my $portstr = "ANY";
- my $port = new Vyatta::NatRule;
+ my $port = undef;
+ $port = new Vyatta::SrcNatRule if ($type eq 'source');
+ $port = new Vyatta::DstNatRule if ($type eq 'destination');
  $port->setupOrig("$level");
  $portstr = $port->{$inoroutaddr}->{_port} if defined $port->{$inoroutaddr}->{_port};
  return $portstr;
@@ -74,7 +88,9 @@ sub get_inout_address {
 
  my ($level, $inoroutaddr) = @_;
  my $address = "ANY";
- my $addr = new Vyatta::NatRule;
+ my $addr = undef;
+ $addr = new Vyatta::SrcNatRule if ($type eq 'source');
+ $addr = new Vyatta::DstNatRule if ($type eq 'destination');
  $addr->setupOrig("$level");
  if (defined $addr->{$inoroutaddr}->{_addr}) {
   $address = $addr->{$inoroutaddr}->{_addr};
@@ -83,7 +99,7 @@ sub get_inout_address {
    $address = $addr->{$inoroutaddr}->{_range}->{_start} 
               . "-" . $addr->{$inoroutaddr}->{_range}->{_stop};
  }
- return $address;
+ return $address; 
 
 }
 
@@ -107,12 +123,11 @@ sub get_primary_addr {
 }
 
 sub print_constants {
-
- print "\nType Codes:  SRC - source, DST - destination, MASQ - masquerade\n";
- print "              X at the front of rule implies rule is excluded\n\n";
- printf($format1, 'rule', 'type', 'intf', 'translation');
+ print "Disabled rules are not shown\n";
+ print "Codes: X - exclude rule, M - masquerade rule\n\n";
+ printf($format1, 'rule', 'intf', 'translation');
  print "\n";
- printf($format1, '----', '----', '----', '-----------');
+ printf($format1, '----', '----', '-----------');
 
 }
 
@@ -147,59 +162,78 @@ sub make_condition_str {
 
 }
 
-
 #
 # main
 #
 
+if ( !defined($type) ) {
+    die("Must specify NAT type!\n");
+}
+else {
+     if ($type eq "source") {
+         $level = $src_level;
+     }
+     elsif ($type eq "destination") {
+         $level = $dst_level;
+     }
+     else {
+         die("Unknown NAT type $type");
+     }
+}
+
 my $config = new Vyatta::Config;
-$config->setLevel("service nat rule");
+$config->setLevel("$level");
 my @rules_pre = $config->listOrigNodes();
 my $rule;
 my @rules = sort numerically @rules_pre;
 
 print_constants();
 for $rule (@rules) {
-  my ($rulenum, $type, $protocol, $interface, $source_addr, $source_port,
+  my ($rulenum, $protocol, $interface, $source_addr, $source_port,
       $destination_addr, $destination_port, $translation_addr, $translation_port,
       $translation_addr_str, $translation_port_str, $condition);
   
   $rulenum = $rule;
   $protocol = "all";
   
-  my $nrule = new Vyatta::NatRule;
+  my $nrule = undef;
+  $nrule = new Vyatta::SrcNatRule if ($type eq "source");
+  $nrule = new Vyatta::DstNatRule if ($type eq "destination");
   my $src = new Vyatta::IpTables::AddressFilter;
   my $dst = new Vyatta::IpTables::AddressFilter;
   
-  $nrule->setupOrig("service nat rule $rule");
+  $nrule->setupOrig("$level $rule");
   next if defined $nrule->{_disable};
   $rulenum = "X" . $rule if defined $nrule->{_exclude};
-  $type = $nat_type{$nrule->{_type}};
+  $rulenum = "M". $rule if defined $nrule->{_is_masq};
   $protocol = $nrule->{_proto} if defined $nrule->{_proto};
   $protocol = "proto-" . $protocol;
   $interface = $nrule->{_inbound_if} if defined $nrule->{_inbound_if};
   $interface = $nrule->{_outbound_if} if defined $nrule->{_outbound_if};
 
-  $source_addr = get_srcdst_address("service nat rule $rule source");
-  $destination_addr = get_srcdst_address("service nat rule $rule destination");
-  $source_port = get_srcdst_port("service nat rule $rule source");
-  $destination_port = get_srcdst_port("service nat rule $rule destination");
-  
-  if ($type eq 'SRC' || $type eq 'MASQ') {
-   $translation_addr = get_inout_address("service nat rule $rule", "_outside_addr")
-                       if $type eq 'SRC';
-   $translation_addr = get_primary_addr($interface)
-                       if $type eq 'MASQ';
-   $translation_port = get_inout_port("service nat rule $rule", "_outside_addr");
-   $translation_addr_str = make_translate_addrorport_str ("source", 
+  $source_addr = get_srcdst_address("$level $rule source");
+  $destination_addr = get_srcdst_address("$level $rule destination");
+  $source_port = get_srcdst_port("$level $rule source");
+  $destination_port = get_srcdst_port("$level $rule destination");
+
+  if ($type eq 'source') {
+      my $raw_translation_addr = get_inout_address("$level $rule", "_outside_addr");
+      if ($raw_translation_addr eq "masquerade") {
+          $translation_addr = get_primary_addr($interface);
+      }
+      else {
+          $translation_addr = $raw_translation_addr;
+      }
+      $translation_port = get_inout_port("$level $rule", "_outside_addr");
+      $translation_addr_str = make_translate_addrorport_str ("source", 
                            $source_addr, $translation_addr, "address");
-   $translation_port_str = make_translate_addrorport_str ("source", 
-                           $source_port, $translation_port, "port");
-   $condition = make_condition_str ("destination", 
-                $destination_addr, $destination_port);
-  } elsif ($type eq 'DST') {
-   $translation_addr = get_inout_address("service nat rule $rule", "_inside_addr");
-   $translation_port = get_inout_port("service nat rule $rule", "_inside_addr");
+      $translation_port_str = make_translate_addrorport_str ("source", 
+                              $source_port, $translation_port, "port");
+      $condition = make_condition_str ("destination", 
+                   $destination_addr, $destination_port);
+   } elsif ($type eq 'destination') {
+   $translation_addr = get_inout_address("$level $rule", "_inside_addr");
+   $translation_port = get_inout_port("$level $rule", "_inside_addr");
    $translation_addr_str = make_translate_addrorport_str ("destination",
                            $destination_addr, $translation_addr, "address");
    $translation_port_str = make_translate_addrorport_str ("destination",
@@ -209,11 +243,11 @@ for $rule (@rules) {
   }
   
   print "\n";
-  printf ($format1, $rulenum, $type, $interface, $translation_addr_str);
+  printf ($format1, $rulenum, $interface, $translation_addr_str);
   print "\n";
   printf ($format2, $protocol, $translation_port_str);
   print "\n";
-  printf ($format1, "", "", "", $condition) if !($condition eq "");
+  printf ($format1, "", "", $condition) if $condition ne "";
   print "\n";
 }
 
