@@ -42,7 +42,7 @@ my $src_level = "nat source rule";
 my $dst_level = "nat destination rule";
 my $level = undef;
 
-my $format1  = "%-5s  %-16s  %-58s";
+my $format1  = "%-6s  %-16s  %-58s";
 my $format2  = "       %-16s  %-62s";
 
 sub numerically { $a <=> $b; }
@@ -205,8 +205,8 @@ for $rule (@rules) {
   
   $nrule->setupOrig("$level $rule");
   next if defined $nrule->{_disable};
-  $rulenum = "X" . $rule if defined $nrule->{_exclude};
-  $rulenum = "M". $rule if defined $nrule->{_is_masq};
+  $rulenum = "X" . $rulenum if defined $nrule->{_exclude};
+  $rulenum = "M". $rulenum if defined $nrule->{_is_masq};
   $protocol = $nrule->{_proto} if defined $nrule->{_proto};
   $protocol = "proto-" . $protocol;
   $interface = $nrule->{_inbound_if} if defined $nrule->{_inbound_if};
