@@ -43,7 +43,7 @@ my $dst_level = "nat destination rule";
 my $level = undef;
 
 my $format1  = "%-6s  %-16s  %-58s";
-my $format2  = "       %-16s  %-62s";
+my $format2  = "        %-16s  %-62s";
 
 sub numerically { $a <=> $b; }
 
