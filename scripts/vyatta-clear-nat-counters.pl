@@ -89,11 +89,15 @@ sub clear_rule {
     $iptables_rule = `$cmd`;
     return "couldn't find an underlying iptables rule" if ! defined $iptables_rule;
     chomp $iptables_rule;
+    # Rules with "log" statement and "tcp_udp" rules take more than one line
+    my @numbers = split(/\n/, $iptables_rule);
 
     # clear the counters for that rule
-    $cmd = "$iptables -t nat -Z $chain $iptables_rule";
-    $error = system($cmd);
-    return "error clearing counters for NAT rule $clirule" if $error;
+    for my $number (@numbers) {
+        $cmd = "$iptables -t nat -Z $chain $number";
+        $error = system($cmd);
+        return "error clearing counters for NAT rule $clirule" if $error;
+    }
   }
   return;
 }
