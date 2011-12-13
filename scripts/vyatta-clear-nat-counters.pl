@@ -31,15 +31,22 @@ use lib "/opt/vyatta/share/perl5";
 use Vyatta::Config;
 
 # NAT type mapping from config node to iptables chain
-my %chain_hash = ( 'source'        => 'POSTROUTING',
-                   'destination'   => 'PREROUTING',
-                   'masquerade'    => 'POSTROUTING');
+my $src_chain = "POSTROUTING";
+my $dst_chain = "PREROUTING";
+my $chain = undef;
+
+# NAT CLI levels
+my $src_level = "nat source rule";
+my $dst_level = "nat destination rule";
+my $level = undef;
+
+my $iptables = "sudo /sbin/iptables";
 
 sub numerically { $a <=> $b; }
 
 sub get_nat_rules {
   my $config = new Vyatta::Config;
-  $config->setLevel("service nat rule");
+  $config->setLevel($level);
   my @rules = sort numerically $config->listOrigNodes();
   return @rules;
 }
@@ -57,7 +64,7 @@ sub clear_rule {
 
   if ($clirule eq 'all') {
     # clear counters for all rules in NAT table
-    $error = system("sudo /sbin/iptables -Z -t nat &>/dev/null");
+    $error = system("$iptables -Z -t nat &>/dev/null");
     return "error clearing NAT rule counters" if $error;
   } else {
     # clear counters for a specific NAT rule
@@ -69,25 +76,22 @@ sub clear_rule {
     }
 
     my $config = new Vyatta::Config;
-    $config->setLevel("service nat rule");
+    $config->setLevel($level);
 
     # make sure rule is enabled
     my $is_rule_disabled = $config->existsOrig("$clirule disable");
     return "NAT rule $clirule is disabled" if defined $is_rule_disabled;
 
-    # determine rule type
-    my $rule_type = $config->returnOrigValue("$clirule type");
-
     # find corresponding rulenum in the underlying NAT table
     my $iptables_rule = undef;
-    my $cmd = "sudo /sbin/iptables -L $chain_hash{$rule_type} -t nat -nv " .
-              "--line-numbers | grep '/\* NAT-$clirule ' | awk {'print \$1'}";
+    my $cmd = "$iptables -L $chain -t nat -nv " .
+              "--line-numbers | grep '/\* .*NAT-$clirule' | awk {'print \$1'}";
     $iptables_rule = `$cmd`;
     return "couldn't find an underlying iptables rule" if ! defined $iptables_rule;
     chomp $iptables_rule;
 
     # clear the counters for that rule
-    $cmd = "sudo /sbin/iptables -t nat -Z $chain_hash{$rule_type} $iptables_rule";
+    $cmd = "$iptables -t nat -Z $chain $iptables_rule";
     $error = system($cmd);
     return "error clearing counters for NAT rule $clirule" if $error;
   }
@@ -98,13 +102,26 @@ sub clear_rule {
 # main
 #
 
-my ($action, $clirulenum);
+my ($action, $clirulenum, $type);
 
 GetOptions( "action=s"  => \$action,
-            "clirule=s" => \$clirulenum);
+            "clirule=s" => \$clirulenum,
+            "type=s"    => \$type
+          );
 
 die "undefined action" if ! defined $action;
 die "undefined rule number" if ! defined $clirulenum;
+die "undefined NAT type" if ! defined $type;
+
+if ($type eq 'source') {
+    $level = $src_level;
+    $chain = $src_chain;
+} elsif ($type eq 'destination') {
+    $level = $dst_level;
+    $chain = $dst_chain;
+} else {
+    die "unknown NAT type";
+}
 
 my ($error, $warning);
 
