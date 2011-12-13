@@ -1,0 +1,2 @@
+help: Clear source NAT counters
+run: /opt/vyatta/sbin/vyatta-clear-nat-counters.pl --action=clear-counters --clirule=all --type=destination

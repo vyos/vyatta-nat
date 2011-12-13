@@ -1,0 +1,3 @@
+help: Clear counters for a specific NAT rule
+allowed: /opt/vyatta/sbin/vyatta-clear-nat-counters.pl --action=print-nat-rules --clirule=all --type=source
+run: /opt/vyatta/sbin/vyatta-clear-nat-counters.pl --action=clear-counters --clirule="$6" --type=source
