@@ -7,7 +7,7 @@ curverdir = $(sysconfdir)/config-migrate/current
 
 sbin_SCRIPTS = scripts/vyatta-update-dst-nat.pl
 sbin_SCRIPTS += scripts/vyatta-update-src-nat.pl
-sbin_SCRIPTS += scripts/vyatta-show-nat.pl
+sbin_SCRIPTS += scripts/vyatta-show-nat-statistics.pl
 sbin_SCRIPTS += scripts/vyatta-show-nat-rules.pl
 sbin_SCRIPTS += scripts/vyatta-clear-nat-counters.pl
 
