@@ -1,0 +1,2 @@
+help: Show statistics for configured source NAT rules
+run: /opt/vyatta/sbin/vyatta-show-nat-statistics.pl --type=source
