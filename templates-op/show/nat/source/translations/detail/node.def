@@ -1,0 +1,3 @@
+help: Show active source NAT translations detail
+run: sudo ${vyatta_bindir}/sudo-users/vyatta-nat-translations.pl --type=source \
+                                                                 --verbose

@@ -1,2 +1,0 @@
-help: Show active NAT translations detail
-run: sudo ${vyatta_bindir}/sudo-users/vyatta-nat-translations.pl --verbose

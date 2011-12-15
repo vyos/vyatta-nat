@@ -1,2 +1,0 @@
-help: Show active NAT destination translations
-run: sudo ${vyatta_bindir}/sudo-users/vyatta-nat-translations.pl --mode=dnat

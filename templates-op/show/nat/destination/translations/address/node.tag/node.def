@@ -1,9 +1,9 @@
-help: Show active NAT source translations for an IP address
+help: Show active destination NAT translations for an IP address
 allowed: echo -n '<x.x.x.x>'
 run: if /opt/vyatta/sbin/vyatta-validate-type.pl -q ipv4 $6 
        then
          sudo ${vyatta_bindir}/sudo-users/vyatta-nat-translations.pl \
-                                                         --mode=snat \
+                                                         --type=destination \
                                                          --verbose   \
                                                          --ipaddr="$6"
        else

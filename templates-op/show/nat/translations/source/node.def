@@ -1,2 +1,0 @@
-help: Show active NAT source translations
-run: sudo ${vyatta_bindir}/sudo-users/vyatta-nat-translations.pl --mode=snat
