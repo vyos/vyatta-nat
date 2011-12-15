@@ -33,9 +33,9 @@ use strict;
 
 my $dump = 0;
 my ($xml_file, $verbose, $proto, $stats, $ipaddr, $pipe);
-my $mode;
+my $type;
 my $verbose_format = "%-20s %-18s %-20s %-18s\n";
-my $format         = "%-20s %-20s %-4s  %-4s  %-8s";
+my $format         = "%-20s %-20s %-4s  %-8s";
 
 sub add_xml_root {
     my $xml = shift;
@@ -73,7 +73,7 @@ sub guess_snat_dnat {
 }
 
 sub nat_print_xml {
-    my ($data, $mode) = @_;
+    my ($data, $type) = @_;
 
     my $flow = 0;
 
@@ -127,12 +127,12 @@ sub nat_print_xml {
 	if (defined $verbose) {
 	    printf($verbose_format, $in_src, $in_dst, $out_src, $out_dst);
 	}
-	if (! defined $mode) {
-	    $mode = guess_snat_dnat(\%src, \%dst);
-	}
-	if (defined $mode) {
+#	if (! defined $type) {
+#	    $type = guess_snat_dnat(\%src, \%dst);
+#	}
+	if (defined $type) {
 	    my ($from, $to);
-	    if ($mode eq 'snat') {
+	    if ($type eq 'source') {
 		$from = "$src{original}";
 		$to   = "$dst{reply}";
 		if (defined $sport{original} and defined $dport{reply}) {
@@ -152,13 +152,13 @@ sub nat_print_xml {
 		}
 	    }
 	    if (defined $verbose) {
-		print "  $proto: $mode: $from ==> $to";
+		print "  $proto: $from ==> $to";
 	    } else {
 		my $timeout2 = "";
 		if (defined $timeout) {
 		    $timeout2 = $timeout;
 		}
-		printf($format, $from, $to, $mode, $proto, $timeout2);
+		printf($format, $from, $to, $proto, $timeout2);
 		print " $flow_type" if defined $flow_type;
 		print "\n";
 	    }
@@ -190,7 +190,7 @@ GetOptions("verbose"  => \$verbose,
 	   "proto=s"  => \$proto,
 	   "file=s"   => \$xml_file,
 	   "stats"    => \$stats,
-	   "mode=s"   => \$mode,
+	   "type=s"   => \$type,
 	   "ipaddr=s" => \$ipaddr,
 	   "pipe"     => \$pipe,
 );
@@ -199,6 +199,9 @@ my $conntrack = '/usr/sbin/conntrack';
 if  (! -f $conntrack) {
     die "Package [conntrack] not installed";
 }
+
+die "Must specify NAT type!" if !defined($type);
+die "Unknown NAT type!" if (($type ne 'source') && ($type ne 'destination'));
 
 my $xs = XML::Simple->new(ForceArray => 1, KeepRoot => 0);
 my ($xml, $data);
@@ -210,7 +213,7 @@ if (defined $verbose) {
     printf($verbose_format, 'Pre-NAT src', 'Pre-NAT dst', 
 	   'Post-NAT src', 'Post-NAT dst');
 } else {
-    printf($format, 'Pre-NAT', 'Post-NAT', 'Type', 'Prot', 'Timeout');
+    printf($format, 'Pre-NAT', 'Post-NAT', 'Prot', 'Timeout');
     print " Type" if defined $pipe;
     print "\n";
 }
@@ -230,7 +233,7 @@ if (defined $xml_file) {
 	$xml =~ s/\<conntrack\>//;
 	$xml = add_xml_root($xml);
 	$data = $xs->XMLin($xml);
-	nat_print_xml($data, $mode);
+	nat_print_xml($data, $type);
     }
 } else {
     if (defined $proto) {
@@ -238,8 +241,7 @@ if (defined $xml_file) {
     } else {
 	$proto = "";
     }
-    $mode = 'both' if ! defined $mode;
-    if ($mode eq 'both' or $mode eq 'snat') {
+    if ($type eq 'source') {
 	my $ipopt = "";
 	if (defined $ipaddr) {
 	    $ipopt = "--orig-src $ipaddr";
@@ -248,9 +250,8 @@ if (defined $xml_file) {
 	chomp $xml;
 	$data = undef;
 	$data = $xs->XMLin($xml) if ! $xml eq '';
-	nat_print_xml($data, 'snat') if defined $data;	
     }
-    if ($mode eq 'both' or $mode eq 'dnat') {
+    if ($type eq 'destination') {
 	my $ipopt = "";
 	if (defined $ipaddr) {
 	    $ipopt = "--orig-dst $ipaddr";
@@ -259,8 +260,8 @@ if (defined $xml_file) {
 	chomp $xml;
 	$data = undef;
 	$data = $xs->XMLin($xml) if ! $xml eq '';
-	nat_print_xml($data, 'dnat') if defined $data;	
     }
+    nat_print_xml($data, $type) if defined $data;
 }
 
 # end of file
