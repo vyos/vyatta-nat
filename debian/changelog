@@ -1,3 +1,73 @@
+vyatta-nat (0.12.33) unstable; urgency=low
+
+  [ Mohit Mehta ]
+  * Test push to oxnard-nat-enhancements branch
+
+  [ Daniil Baturin ]
+  * Change NAT config version to 4.
+  * Bug 5681: Templates changed to move NAT out of service branch,
+    "service/nat" -> "nat".
+  * Bug 5681: Change vyatta-update-nat.pl to correspond new
+    configuration path out of service branch.
+  * Fix config version file path in automake rules.
+  * Modify NAT configuration templates to support "any" inbound-
+    interface and outbound-interface.
+  * Add "any" inbound/outbound interface support to NatRule.pm
+  * Bug 4946: Modify NAT templates not to issue a warning when eth+ or
+    other interface group name suitable for NAT is specified as inboud
+    or outbound interface.
+  * Remove old NAT rule templates
+  * Add templates for source NAT
+  * Add templates for destination NAT
+  * Fix description in vyatta-update-nat.pl
+  * Bug 7353: Fix completion for NAT rule protocol option
+  * Bug 5682: Remove old NatRule.pm module now splitted into source and
+    destination parts
+  * Bug 5682: Add NatRuleCommon.pm module with subroutines common
+  * Bug 5682: Add DstNatRule.pm module for destination NAT rules
+    processing
+  * Bug 5682: Add SrcNatRule.pm module for source NAT rules processing
+  * Bug 5682: Remove old vyatta-update-nat.pl script now splitted into
+  * Bug 5682: Add vyatta-update-dst-nat.pl script for destination NAT
+  * Bug 5682: Add vyatta-update-src-nat.pl script for source NAT rules
+    update.
+  * Bug 5682: Add masquerade option to source NAT rule outside-address
+  * Bug 5682: Remove common NAT update script call from templates,
+  * Bug 5682: Update Automake rules to correspond changes
+  * Fix file description for destination NAT update script.
+  * Rename "inside-address" and "outside-address" to "translation"
+  * Impove "translation address/port" help strings
+  * Delete old templates of outside/inside address nodes
+  * Update rule handling modules to correspond "outside/inside-address -
+    > translation" change
+  * Fix help string for destination NAT rule translation port
+  * Fix help string for source NAT translation port
+  * Update log prefixes to match new design spec.
+  * Bug #3888: Issue a warning message if source NAT translation address
+  * Add completion for "translation address masquerade" option.
+  * Update error messages to match "outside/inside-address"-
+    >"translation
+  * Update vyatta-show-nat-rules.pl to match CLI syntax changes.
+  * Fix extra line break when rule condition is empty.
+  * Update op mode templates for "show nat <source|destination> rules".
+  * Bug #6365: Display rule description in "show nat * rules" output.
+  * Fix rule prefix display for rules that are masquerade and exclude
+  * Fix formatting in "show nat * rules".
+  * Update op mode templates for "clear nat * counters".
+  * Update clear counters script to match CLI changes.
+  * Bug #6617: fix counters flush for rules with logging.
+  * Update templates for "show nat <source|destination> statistics".
+  * Update show NAT statistics script to match CLI changes,
+  * Update automake rules to match vyatta-show-nat.pl ->
+  * Update op mode templates for "show nat <source|destination>
+  * Update vyatta-nat-translation.pl to match CLI changes.
+  * Remove XSL files that are unused now.
+  * Update automake rule to reflect removal of XSL files.
+  * Don't display translation address for masquerade rules
+  * Don't display masquerade rule code help for destination rules.
+
+ -- Daniil Baturin <daniil.baturin@vyatta.com>  Wed, 04 Jan 2012 01:14:44 +0700
+
 vyatta-nat (0.12.32) unstable; urgency=low
 
   * new branch
