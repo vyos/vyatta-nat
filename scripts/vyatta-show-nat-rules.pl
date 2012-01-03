@@ -223,6 +223,11 @@ for $rule (@rules) {
       my $raw_translation_addr = get_inout_address("$level $rule", "_outside_addr");
       if ($raw_translation_addr eq "masquerade") {
           $translation_addr = get_primary_addr($interface);
+	  # if translation address is empty after that,
+	  # it's a masquerade rule for any interface
+	  if ($translation_addr eq '') {
+		  $translation_addr = "ANY";
+          }
       }
       else {
           $translation_addr = $raw_translation_addr;
