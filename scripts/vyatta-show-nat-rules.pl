@@ -125,7 +125,9 @@ sub get_primary_addr {
 
 sub print_constants {
  print "Disabled rules are not shown\n";
- print "Codes: X - exclude rule, M - masquerade rule\n\n";
+ print "Codes: X - exclude rule";
+ print ", M - masquerade rule" if $type eq 'source'; # M code never appears in destination
+ print "\n\n";
  printf($format1, 'rule', 'intf', 'translation');
  print "\n";
  printf($format1, '----', '----', '-----------');
