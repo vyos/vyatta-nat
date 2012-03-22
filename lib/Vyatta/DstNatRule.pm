@@ -160,15 +160,15 @@ sub rule_str {
     $str =~ s/^\!(.*)$/! $1/;
     if ($str eq 'tcp_udp') {
       $tcp_and_udp = 1;
-      $rule_str .= " -p tcp"; # we'll add the '-p udp' to 2nd rule later
+      $rule_str .= " -p tcp "; # we'll add the '-p udp' to 2nd rule later
     } else {
-      $rule_str .= " -p $str";
+      $rule_str .= " -p $str ";
     }
   }
 
   if (defined($self->{_inbound_if})) {
     if ($self->{_inbound_if} ne "any") {
-      $rule_str .= " -i $self->{_inbound_if}";
+      $rule_str .= " -i $self->{_inbound_if} ";
     }
   } else {
     # make this a requirement to prevent users from
@@ -289,7 +289,7 @@ sub rule_str {
   if ($tcp_and_udp == 1) {
     $comment = "\"$type-NAT-$self->{_rule_number} tcp_udp\" ";
   }
-  $rule_str .= "$src_str $dst_str" . " -m comment --comment " . $comment;
+  $rule_str .= "$src_str $dst_str" . " -m comment --comment " . $comment . " ";
   if ("$self->{_log}" eq "enable") {
     my $rule_num = $self->{_rule_number};
     my $log_prefix = get_log_prefix($rule_num, $type, $log_modifier);
