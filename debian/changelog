@@ -1,3 +1,9 @@
+vyatta-nat (0.12.33+oxnard2) unstable; urgency=low
+
+  * Bug #7655: add both leading and trailing spaces to iptables
+
+ -- Daniil Baturin <daniil.baturin@vyatta.com>  Fri, 23 Mar 2012 00:34:38 +0700
+
 vyatta-nat (0.12.33+oxnard1) unstable; urgency=low
 
   * new branch
