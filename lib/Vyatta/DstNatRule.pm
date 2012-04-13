@@ -157,12 +157,12 @@ sub rule_str {
   
   if (defined($self->{_proto})) {
     my $str = $self->{_proto};
-    $str =~ s/^\!(.*)$/! $1/;
+    $str =~ s/^\!(.*)$/ $1/;
     if ($str eq 'tcp_udp') {
       $tcp_and_udp = 1;
-      $rule_str .= " -p tcp"; # we'll add the '-p udp' to 2nd rule later
+      $rule_str .= " -p tcp "; # we'll add the '-p udp' to 2nd rule later
     } else {
-      $rule_str .= " -p $str";
+      $rule_str .= " ! -p $str ";
     }
   }
 
