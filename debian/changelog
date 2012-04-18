@@ -1,3 +1,9 @@
+vyatta-nat (0.12.36) unstable; urgency=low
+
+  * Bug #7655: add both leading and trailing spaces to iptables
+
+ -- Daniil Baturin <daniil.baturin@vyatta.com>  Wed, 18 Apr 2012 21:34:26 +0700
+
 vyatta-nat (0.12.35) unstable; urgency=low
 
   * use negation before -p <protocol> as per new iptables upgrade
