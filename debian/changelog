@@ -1,3 +1,9 @@
+vyatta-nat (0.12.38) unstable; urgency=low
+
+  * Bugfix 8113: make negations work properly
+
+ -- John Southworth <john.southworth@vyatta.com>  Mon, 18 Jun 2012 14:49:20 -0700
+
 vyatta-nat (0.12.37) unstable; urgency=low
 
   * Force release
