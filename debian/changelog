@@ -1,3 +1,9 @@
+vyatta-nat (0.12.40) unstable; urgency=low
+
+  * new branch
+
+ -- John Southworth <john.southworth@vyatta.com>  Fri, 12 Oct 2012 19:47:36 -0700
+
 vyatta-nat (0.12.39) unstable; urgency=low
 
   [ Bharat ]
