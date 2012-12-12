@@ -34,7 +34,7 @@ use Vyatta::TypeChecker;
 
 require Exporter;
 our @ISA = qw(Exporter);
-our @EXPORT = qw(is_disabled get_num_ipt_rules  get_log_prefix output_xml_elem);
+our @EXPORT = qw(is_disabled get_num_ipt_rules  get_log_prefix output_xml_elem make_src_dst_str);
 
 sub is_disabled {
   my $self = shift;
@@ -74,6 +74,20 @@ sub output_xml_elem {
   print $fh "    <$name>$value</$name>\n";
 }
 
+# Single port option must be before multiport one,
+# rearrange if needed
+sub make_src_dst_str {
+  my ($src_str, $dst_str) = @_;
+  my $src_dst_str;
+  if (grep /multiport/, $src_str) {
+    $src_dst_str = " $dst_str $src_str ";
+  } elsif (grep /multiport/, $dst_str) {
+    $src_dst_str = " $src_str $dst_str ";
+  } else {
+    $src_dst_str = " $src_str $dst_str ";
+  }
+  return $src_dst_str;
+}
 
 1;
 

@@ -291,7 +291,8 @@ sub rule_str {
   if ($tcp_and_udp == 1) {
     $comment = "\"$type-NAT-$self->{_rule_number} tcp_udp\" ";
   }
-  $rule_str .= "$src_str $dst_str" . " -m comment --comment " . $comment . " ";
+  my $src_dst_str = make_src_dst_str($src_str, $dst_str);
+  $rule_str .= " $src_dst_str " . " -m comment --comment " . $comment . " ";
   if ("$self->{_log}" eq "enable") {
     my $rule_num = $self->{_rule_number};
     my $log_prefix = get_log_prefix($rule_num, $type, $log_modifier);
