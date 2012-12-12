@@ -1,3 +1,9 @@
+vyatta-nat (0.12.40+daisy2) unstable; urgency=low
+
+  * Bug 8337: don't disallow using source and destination with
+
+ -- Daniil Baturin <daniil.baturin@vyatta.com>  Wed, 12 Dec 2012 07:11:04 -0800
+
 vyatta-nat (0.12.40+daisy1) unstable; urgency=low
 
   * create daisy branch
