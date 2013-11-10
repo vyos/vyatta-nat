@@ -1,3 +1,16 @@
+vyatta-nat (0.13.0+hydrogen2) unstable; urgency=low
+
+  * Bug #8331: provide rule number in commit error message.
+  * Update maintainer addresses
+
+ -- Daniil Baturin <daniil@baturin.org>  Sun, 10 Nov 2013 15:52:51 +0100
+
+vyatta-nat (0.13.0+hydrogen1) unstable; urgency=low
+
+  * Fix branch name
+
+ -- Daniil Baturin <daniil@baturin.org>  Sun, 10 Nov 2013 00:00:00 +0100
+
 vyatta-nat (0.12.40+daisy2) unstable; urgency=low
 
   * Bug 8337: don't disallow using source and destination with
