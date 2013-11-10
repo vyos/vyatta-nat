@@ -10,7 +10,6 @@ Architecture: all
 Depends: vyatta-cfg (>= 0.15.33),
  vyatta-bash | bash (>= 3.1),
  vyatta-op,
- vyatta-op-xml,
  iptables,
  conntrack,
  libxml-simple-perl
