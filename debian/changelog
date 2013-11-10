@@ -1,3 +1,9 @@
+vyatta-nat (0.13.0+hydrogen3) unstable; urgency=low
+
+  * Remove dependency on vyatta-op-xml.
+
+ -- Daniil Baturin <daniil@baturin.org>  Sun, 10 Nov 2013 17:00:40 +0100
+
 vyatta-nat (0.13.0+hydrogen2) unstable; urgency=low
 
   * Bug #8331: provide rule number in commit error message.
