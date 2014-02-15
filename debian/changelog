@@ -1,3 +1,9 @@
+vyatta-nat (0.13.0+vyos1+helium1) unstable; urgency=low
+
+  * New branch
+
+ -- Daniil Baturin <daniil@baturin.org>  Sat, 15 Feb 2014 19:29:50 +0100
+
 vyatta-nat (0.13.0+hydrogen3) unstable; urgency=low
 
   * Remove dependency on vyatta-op-xml.
