@@ -41,6 +41,18 @@ sub raw_cleanup {
 }
 
 my $config = new Vyatta::Config;
+
+my $all_deleted = 1;
+
+$config->setLevel("nat destination rule");
+my %rules_dst = $config->listNodeStatus();
+my $rule_dst;
+for $rule_dst (keys %rules_dst) {
+  if ($rules_dst{$rule_dst} ne "deleted") {
+    $all_deleted = 0;
+  }
+}
+
 $config->setLevel($CONFIG_LEVEL." rule");
 my %rules = $config->listNodeStatus();
 my $rule;
@@ -69,7 +81,6 @@ system("$IPTABLES -t nat -L -n >& /dev/null");
 # we have some nat rule(s). make sure conntrack is enabled.
 ipt_enable_conntrack('iptables', 'NAT_CONNTRACK');
 
-my $all_deleted = 1;
 for $rule (@rule_keys) {
   print OUT "$rule: $rules{$rule}\n";
   my $tmp = `iptables -L -nv --line -t nat`;
