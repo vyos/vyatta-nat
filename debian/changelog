@@ -1,3 +1,9 @@
+vyatta-nat (0.13.0+vyos2+lithium1) unstable; urgency=low
+
+  * New branch
+
+ -- Alex Harpin <development@landsofshadow.co.uk>  Tue, 09 Dec 2014 21:59:53 +0000
+ 
 vyatta-nat (0.13.0+vyos1+helium2) unstable; urgency=low
 
   [ Yuya Kusakabe ]
