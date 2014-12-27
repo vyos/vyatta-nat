@@ -1,3 +1,9 @@
+vyatta-nat (0.13.0+vyos2+lithium2) unstable; urgency=low
+
+  * Update maintainer address
+
+ -- Alex Harpin <development@landsofshadow.co.uk>  Sat, 27 Dec 2014 11:23:39 +0000
+ 
 vyatta-nat (0.13.0+vyos2+lithium1) unstable; urgency=low
 
   * New branch
