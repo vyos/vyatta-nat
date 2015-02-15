@@ -1,0 +1,11 @@
+tag:
+
+type: u32
+
+help: Rule number for NAT
+
+syntax:expression: ($VAR(@) > 0 && $VAR(@) < 10000) ; \
+         "Rule number must be between 1 and 9999."
+
+val_help: u32:1-9999 ; Number for this NAT rule
+

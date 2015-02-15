@@ -1,0 +1,7 @@
+type: txt
+
+help: Inside prefix to be translated 
+
+val_help: ipv6net; IPv6 prefix to match
+
+syntax:expression: exec "/opt/vyatta/sbin/vyatta-validate-type ipv6_addr_param $VAR(@)"
