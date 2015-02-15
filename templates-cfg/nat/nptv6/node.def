@@ -1,0 +1,3 @@
+help: NPTv6 settings
+
+end:expression: "sudo /opt/vyatta/sbin/vyos-update-nptv6.pl"
