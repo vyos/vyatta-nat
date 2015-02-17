@@ -1,3 +1,12 @@
+vyatta-nat (0.13.0+vyos2+lithium3) unstable; urgency=low
+
+  [ kouak ]
+  * Add initial support for NPTv6 (#387)
+
+  [ Daniil Baturin ]
+
+ -- Daniil Baturin <daniil@baturin.org>  Tue, 17 Feb 2015 09:54:05 +0100
+
 vyatta-nat (0.13.0+vyos2+lithium2) unstable; urgency=low
 
   * Update maintainer address
