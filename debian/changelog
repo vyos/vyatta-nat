@@ -1,3 +1,9 @@
+vyatta-nat (0.13.0+vyos2+lithium4) unstable; urgency=low
+
+  * vyatta-nat: update dh_gencontrol with new development build flag
+
+ -- Alex Harpin <development@landsofshadow.co.uk>  Fri, 19 Jun 2015 07:38:08 +0100
+ 
 vyatta-nat (0.13.0+vyos2+lithium3) unstable; urgency=low
 
   [ kouak ]
