@@ -82,6 +82,23 @@ system("$IPTABLES -t nat -L -n >& /dev/null");
 ipt_enable_conntrack('iptables', 'NAT_CONNTRACK');
 
 for $rule (@rule_keys) {
+  my $rule_test = new Vyatta::DstNatRule;
+  $rule_test->setup($CONFIG_LEVEL." rule $rule");
+
+  if (($rules{$rule} eq "static") || ($rules{$rule} eq "deleted")) {
+    next;
+  } else {
+    my ($err, @rule_strs) = $rule_test->rule_str();
+    if (defined $err) {
+      # rule check failed => return error
+      print OUT "Destination NAT configuration error in rule $rule: $err\n";
+      print STDERR "Destination NAT configuration error in rule $rule: $err\n";
+      exit 5;
+    }
+  }
+}
+  
+for $rule (@rule_keys) {
   print OUT "$rule: $rules{$rule}\n";
   my $tmp = `iptables -L -nv --line -t nat`;
   print OUT "iptables before:\n$tmp\n";
@@ -112,12 +129,6 @@ for $rule (@rule_keys) {
   }
   
   my ($err, @rule_strs) = $nrule->rule_str();
-  if (defined $err) {
-    # rule check failed => return error
-    print OUT "Destination NAT configuration error in rule $rule: $err\n";
-    print STDERR "Destination NAT configuration error in rule $rule: $err\n";
-    exit 5;
-  }
   
   if ($rules{$rule} eq "added") {
     foreach my $rule_str (@rule_strs) {
