@@ -1,3 +1,11 @@
+vyatta-nat (0.13.0+vyos2+lithium6) unstable; urgency=low
+
+  [ Alex Harpin ]
+  * Revert "vyatta-nat: check nat rules for errors before processing them for real"
+  * vyatta-nat: check nat rules for errors before processing them for real
+
+ -- Alex Harpin <development@landsofshadow.co.uk>  Sun, 19 Jul 2015 10:29:57 +0100
+ 
 vyatta-nat (0.13.0+vyos2+lithium5) unstable; urgency=low
 
   [ Alex Harpin ]
