@@ -83,15 +83,13 @@ system("$IPTABLES -t nat -L -n >& /dev/null");
 ipt_enable_conntrack('iptables', 'NAT_CONNTRACK');
 
 for $rule (@rule_keys) {
-    my $rule_test = new Vyatta::SrcNatRule;
-    $rule_test->setup($CONFIG_LEVEL." rule $rule");
-
     if (($rules{$rule} eq "static") || ($rules{$rule} eq "deleted")) {
         next;
     } else {
-        my ($err, @rule_strs) = $rule_test->rule_str();
+        my $test_rule = new Vyatta::SrcNatRule;
+        $test_rule->setup($CONFIG_LEVEL." rule $rule");
+        my ($err, @rule_strs) = $test_rule->rule_str();
         if (defined $err) {
-
             # rule check failed => return error
             print OUT "Source NAT configuration error in rule $rule: $err\n";
             print STDERR "Source NAT configuration error in rule $rule: $err\n";
