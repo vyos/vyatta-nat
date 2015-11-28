@@ -33,11 +33,12 @@ use Vyatta::IpTables::Mgr;
 my $CONFIG_LEVEL = "nat source";
 my $IPTABLES = "/sbin/iptables";
 
-sub numerically { $a <=> $b; }
+sub numerically {$a <=> $b;}
 
 sub raw_cleanup {
-  # remove the conntrack setup.
-  ipt_disable_conntrack('iptables', 'NAT_CONNTRACK');
+
+    # remove the conntrack setup.
+    ipt_disable_conntrack('iptables', 'NAT_CONNTRACK');
 }
 
 my $config = new Vyatta::Config;
@@ -48,9 +49,9 @@ $config->setLevel("nat destination rule");
 my %rules_dst = $config->listNodeStatus();
 my $rule_dst;
 for $rule_dst (keys %rules_dst) {
-  if ($rules_dst{$rule_dst} ne "deleted") {
-    $all_deleted = 0;
-  }
+    if ($rules_dst{$rule_dst} ne "deleted") {
+        $all_deleted = 0;
+    }
 }
 
 $config->setLevel($CONFIG_LEVEL." rule");
@@ -58,9 +59,9 @@ my %rules = $config->listNodeStatus();
 my $rule;
 my $debug = 0;
 if ($debug) {
-  open(OUT, ">>/tmp/nat") or exit 1;
+    open(OUT, ">>/tmp/nat") or exit 1;
 } else {
-  open(OUT, ">>/dev/null") or exit 1;
+    open(OUT, ">>/dev/null") or exit 1;
 }
 
 my $ipt_rulenum = 2;
@@ -70,8 +71,8 @@ my $chain_name = "POSTROUTING";
 print OUT "========= src-nat list =========\n";
 my @rule_keys = sort numerically keys %rules;
 if ($#rule_keys < 0) {
-  raw_cleanup();
-  exit 0;
+    raw_cleanup();
+    exit 0;
 }
 
 ## it seems that "multiport" does not like port range (p1:p2) if nobody has
@@ -82,97 +83,97 @@ system("$IPTABLES -t nat -L -n >& /dev/null");
 ipt_enable_conntrack('iptables', 'NAT_CONNTRACK');
 
 for $rule (@rule_keys) {
-  my $rule_test = new Vyatta::SrcNatRule;
-  $rule_test->setup($CONFIG_LEVEL." rule $rule");
+    my $rule_test = new Vyatta::SrcNatRule;
+    $rule_test->setup($CONFIG_LEVEL." rule $rule");
 
-  if (($rules{$rule} eq "static") || ($rules{$rule} eq "deleted")) {
-    next;
-  } else {
-    my ($err, @rule_strs) = $rule_test->rule_str();
-    if (defined $err) {
-      # rule check failed => return error
-      print OUT "Source NAT configuration error in rule $rule: $err\n";
-      print STDERR "Source NAT configuration error in rule $rule: $err\n";
-      exit 5;
+    if (($rules{$rule} eq "static") || ($rules{$rule} eq "deleted")) {
+        next;
+    } else {
+        my ($err, @rule_strs) = $rule_test->rule_str();
+        if (defined $err) {
+
+            # rule check failed => return error
+            print OUT "Source NAT configuration error in rule $rule: $err\n";
+            print STDERR "Source NAT configuration error in rule $rule: $err\n";
+            exit 5;
+        }
     }
-  }
 }
 
 for $rule (@rule_keys) {
-  print OUT "$rule: $rules{$rule}\n";
-  my $tmp = `iptables -L -nv --line -t nat`;
-  print OUT "iptables before:\n$tmp\n";
-  my $nrule = new Vyatta::SrcNatRule;
-  $nrule->setup($CONFIG_LEVEL." rule $rule");
+    print OUT "$rule: $rules{$rule}\n";
+    my $tmp = `iptables -L -nv --line -t nat`;
+    print OUT "iptables before:\n$tmp\n";
+    my $nrule = new Vyatta::SrcNatRule;
+    $nrule->setup($CONFIG_LEVEL." rule $rule");
 
-  if ($rules{$rule} ne "deleted") {
-    $all_deleted = 0;
-  }
- 
-  my $cmd;
-  if ($rules{$rule} eq "static") {
-    my $ipt_rules = $nrule->get_num_ipt_rules();
-    $ipt_rulenum += $ipt_rules;
-    next;
-  } elsif ($rules{$rule} eq "deleted") {
-    my $orule = new Vyatta::SrcNatRule;
-    $orule->setupOrig($CONFIG_LEVEL." rule $rule");
-    my $ipt_rules = $orule->get_num_ipt_rules();
-    for (1 .. $ipt_rules) {
-      $cmd = "$IPTABLES -t nat -D $chain_name $ipt_rulenum";
-      print OUT "$cmd\n";
-      if (system($cmd)) {
-        exit 1;
-      }
-    }
-    next;
-  }
-  
-  my ($err, @rule_strs) = $nrule->rule_str();
-  
-  if ($rules{$rule} eq "added") {
-    foreach my $rule_str (@rule_strs) {
-      next if !defined $rule_str;
-      $cmd = "$IPTABLES -t nat -I $chain_name $ipt_rulenum " .
-          "$rule_str";
-      print OUT "$cmd\n";
-      if (system($cmd)) {
-        exit 1;
-      }
-      $ipt_rulenum++;
+    if ($rules{$rule} ne "deleted") {
+        $all_deleted = 0;
     }
 
-  } elsif ($rules{$rule} eq "changed") {
-    # delete the old rule(s)
-    my $orule = new Vyatta::SrcNatRule;
-    $orule->setupOrig($CONFIG_LEVEL." rule $rule");
-    my $ipt_rules = $orule->get_num_ipt_rules();
-    my $idx = $ipt_rulenum;
-    for (1 .. $ipt_rules) {
-      $cmd = "$IPTABLES -t nat -D $chain_name $idx";
-      print OUT "$cmd\n";
-      if (system($cmd)) {
-        exit 1;
-      }
+    my $cmd;
+    if ($rules{$rule} eq "static") {
+        my $ipt_rules = $nrule->get_num_ipt_rules();
+        $ipt_rulenum += $ipt_rules;
+        next;
+    } elsif ($rules{$rule} eq "deleted") {
+        my $orule = new Vyatta::SrcNatRule;
+        $orule->setupOrig($CONFIG_LEVEL." rule $rule");
+        my $ipt_rules = $orule->get_num_ipt_rules();
+        for (1 .. $ipt_rules) {
+            $cmd = "$IPTABLES -t nat -D $chain_name $ipt_rulenum";
+            print OUT "$cmd\n";
+            if (system($cmd)) {
+                exit 1;
+            }
+        }
+        next;
     }
 
-    # add the new rule(s)
-    foreach my $rule_str (@rule_strs) {
-      next if !defined $rule_str;
-      $cmd = "$IPTABLES -t nat -I $chain_name $ipt_rulenum " .
-          "$rule_str";
-      print OUT "$cmd\n";
-      if (system($cmd)) {
-        exit 1;
-      }
-      $ipt_rulenum++;
-    }
+    my ($err, @rule_strs) = $nrule->rule_str();
 
-  }
+    if ($rules{$rule} eq "added") {
+        foreach my $rule_str (@rule_strs) {
+            next if !defined $rule_str;
+            $cmd = "$IPTABLES -t nat -I $chain_name $ipt_rulenum " ."$rule_str";
+            print OUT "$cmd\n";
+            if (system($cmd)) {
+                exit 1;
+            }
+            $ipt_rulenum++;
+        }
+
+    } elsif ($rules{$rule} eq "changed") {
+
+        # delete the old rule(s)
+        my $orule = new Vyatta::SrcNatRule;
+        $orule->setupOrig($CONFIG_LEVEL." rule $rule");
+        my $ipt_rules = $orule->get_num_ipt_rules();
+        my $idx = $ipt_rulenum;
+        for (1 .. $ipt_rules) {
+            $cmd = "$IPTABLES -t nat -D $chain_name $idx";
+            print OUT "$cmd\n";
+            if (system($cmd)) {
+                exit 1;
+            }
+        }
+
+        # add the new rule(s)
+        foreach my $rule_str (@rule_strs) {
+            next if !defined $rule_str;
+            $cmd = "$IPTABLES -t nat -I $chain_name $ipt_rulenum " ."$rule_str";
+            print OUT "$cmd\n";
+            if (system($cmd)) {
+                exit 1;
+            }
+            $ipt_rulenum++;
+        }
+
+    }
 }
 
 if ($all_deleted) {
-  raw_cleanup();
+    raw_cleanup();
 }
 
 close OUT;
