@@ -1,3 +1,11 @@
+vyatta-nat (0.13.0+vyos2+lithium7) unstable; urgency=low
+
+  [ Alex Harpin ]
+  * vyatta-nat: only create nat object for testing changed or added rules
+  * vyatta-nat: formatting changes for style consistency
+
+ -- Alex Harpin <development@landsofshadow.co.uk>  Sun, 29 Nov 2015 18:50:11 +0000
+
 vyatta-nat (0.13.0+vyos2+lithium6) unstable; urgency=low
 
   [ Alex Harpin ]
