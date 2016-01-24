@@ -1,3 +1,12 @@
+vyatta-nat (0.13.0+vyos2+current1) unstable; urgency=medium
+
+  [ Thomas Jepp ]
+  * Fix build depends.
+
+  [ Kim Hagen ]
+
+ -- Kim Hagen <kim.sidney@gmail.com>  Sun, 24 Jan 2016 15:17:48 -0500
+
 vyatta-nat (0.13.0+vyos2+lithium7) unstable; urgency=low
 
   [ Alex Harpin ]
