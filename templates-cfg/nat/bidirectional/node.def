@@ -1,0 +1,5 @@
+priority: 222
+
+help: Bidirectional NAT settings
+
+end:expression: "sudo /opt/vyatta/sbin/vyatta-update-bidirectional-nat.pl"

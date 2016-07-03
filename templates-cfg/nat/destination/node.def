@@ -1,3 +1,5 @@
+priority: 221
+
 help: Destination NAT settings
 
 end:expression: "sudo /opt/vyatta/sbin/vyatta-update-dst-nat.pl"

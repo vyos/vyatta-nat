@@ -67,8 +67,10 @@ sub new {
 }
 
 sub setup {
-  my ( $self, $level ) = @_;
-  my $config = new Vyatta::Config;
+  my ( $self, $level, $config_ ) = @_;
+  my $config = defined($config_) ? $config_ : new Vyatta::Config;
+
+  $type = "BIDI" if($config->{_is_bidirectional});
 
   $config->setLevel("$level");
   $self->{_rule_number} = $config->returnParent("..");
@@ -94,15 +96,17 @@ sub setup {
   $self->{_outside_addr}->{_port}
     = $config->returnValue("translation port");
 
-  $src->setup("$level source");
-  $dst->setup("$level destination");
+  $src->setup("$level source", $config);
+  $dst->setup("$level destination", $config);
 
   return 0;
 }
 
 sub setupOrig {
-  my ( $self, $level ) = @_;
-  my $config = new Vyatta::Config;
+  my ( $self, $level, $config_ ) = @_;
+  my $config = defined($config_) ? $config_ : new Vyatta::Config;
+
+  $type = "BIDI" if($config->{_is_bidirectional});
 
   $config->setLevel("$level");
 
@@ -129,8 +133,8 @@ sub setupOrig {
   $self->{_outside_addr}->{_port}
     = $config->returnOrigValue("translation port");
 
-  $src->setupOrig("$level source");
-  $dst->setupOrig("$level destination");
+  $src->setupOrig("$level source", $config);
+  $dst->setupOrig("$level destination", $config);
 
   return 0;
 }

@@ -1,0 +1,24 @@
+tag:
+
+type:  txt
+
+help: Protocols to NAT
+
+val_help: txt ; IP protocol name from /etc/protocols (e.g. "tcp" or "udp")
+val_help: u32:0-255 ; IP protocol number
+val_help: tcp_udp ; Both TCP and UDP
+val_help: all ; All IP protocols
+val_help: !<protocol> ; All IP protocols except for the specified name or number (negation)
+
+syntax:expression: exec "if [ -n \"`/opt/vyatta/sbin/vyatta-validate-type.pl protocol_negate '$VAR(@)'`\" ] \
+                        && [ \"$VAR(@)\" != 'tcp_udp' ]; then \
+        echo invalid protocol \"$VAR(@)\" ; \
+        exit 1 ; \
+     fi ; "
+
+# Provide some help for command completion.  Doesn't return negated
+# values or protocol numbers
+allowed:
+        protos=`cat /etc/protocols | sed -e '/^#.*/d' | awk '{ print $1 }' | grep -v '6'`
+        protos="all $protos tcp_udp"
+        echo -n $protos
