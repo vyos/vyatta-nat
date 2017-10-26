@@ -1,3 +1,13 @@
+vyatta-nat (0.13.0+vyos1+helium3) unstable; urgency=low
+
+  [ Ildar Ibragimov ]
+  * Fix protocol negation in NAT (like it is done in
+    Vyatta::IpTables::Rule)
+
+  [ Daniil Baturin ]
+
+ -- Daniil Baturin <daniil@baturin.org>  Thu, 26 Oct 2017 18:18:47 +0200
+
 vyatta-nat (0.13.0+vyos1+helium2) unstable; urgency=low
 
   [ Yuya Kusakabe ]
