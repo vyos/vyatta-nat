@@ -1,6 +1,6 @@
 type: txt
 
-help: Inside prefix to be translated 
+help: IPv6 prefix to be translated 
 
 val_help: ipv6net; IPv6 prefix to match
 

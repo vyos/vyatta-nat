@@ -1,6 +1,6 @@
 type:  txt
 
-help: Outside interface of NPTv6 traffic
+help: Outbound interface of NPTv6 traffic
 
 enumeration: existing-interfaces; echo "any"
 
@@ -20,7 +20,7 @@ commit:expression: exec "
              fi
              let i++
         done
-        intf_group_name_array=\"eth+ bond+ br+ peth+ vtun+ tun+ wlm+ wlan+\"
+        intf_group_name_array=\"eth+ bond+ br+ peth+ vtun+ tun+ wlm+ wlan+ vxlan+ vti+ l2tpeth+\"
         i=0
         for i in $intf_group_name_array; do
           if [ \"$i\" == \"$VAR(@)\" ]; then

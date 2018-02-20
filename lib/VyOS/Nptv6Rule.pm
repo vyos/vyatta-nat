@@ -58,10 +58,9 @@ sub setup {
   $config->setLevel("$level");
 
   $self->{_rule_number} = $config->returnParent("..");
-  $self->{_inside_if} = $config->returnValue("inside-interface");
-  $self->{_outside_if} = $config->returnValue("outside-interface");
-  $self->{_inside_pfx} = $config->returnValue("inside-prefix");
-  $self->{_outside_pfx} = $config->returnValue("outside-prefix");
+  $self->{_outside_if} = $config->returnValue("outbound-interface");
+  $self->{_inside_pfx} = $config->returnValue("source prefix");
+  $self->{_outside_pfx} = $config->returnValue("translation prefix");
 
   $self->{_disable} = $config->exists("disable");
 
