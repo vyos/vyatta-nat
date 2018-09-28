@@ -1,3 +1,9 @@
+vyatta-nat (1.2.0-1) stable; urgency=medium
+
+  * New branch.
+
+ -- Daniil Baturin <daniil@baturin.org>  Fri, 28 Sep 2018 22:00:38 +0200
+
 vyatta-nat (0.13.0+vyos2+current1) unstable; urgency=medium
 
   [ Thomas Jepp ]
