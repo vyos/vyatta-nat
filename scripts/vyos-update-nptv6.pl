@@ -53,7 +53,7 @@ if ($debug) {
 # Send rule to iptables
 sub send_iptables {
   my @cmds = @_;
-  my $prepend = $IPTABLES . " -t mangle ";
+  my $prepend = $IPTABLES . " -t nat ";
   my $cmd;
 
   for $cmd (@cmds) {
@@ -84,7 +84,7 @@ my @cmds;
 # Loop through all loops, sorted numerically
 for $rule (@rule_keys) {
   print OUT "$rule: $rules{$rule}\n";
-  my $tmp = `ip6tables -L -nv --line -t mangle`;
+  my $tmp = `ip6tables -L -nv --line -t nat`;
   print OUT "iptables before:\n$tmp\n";
 
   my $nrule = new VyOS::Nptv6Rule;

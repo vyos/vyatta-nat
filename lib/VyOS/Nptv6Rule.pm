@@ -70,7 +70,7 @@ sub setup {
 
 # Make SNPT ip6tables string
 # POSTROUTING
-# ip6tables -t mangle -I VYOS_NPT_HOOK -s inside-pfx -o outside-if -j SNPT --src-pfx inside-pfx --dst-pfx outside-pfx
+# ip6tables -t nat -I VYOS_SNPT_HOOK -s inside-pfx -o outside-if -j NETMAP --to outside-pfx
 sub make_snpt_string {
   my ($self) = @_;
   my $snpt_str = "";
@@ -83,9 +83,8 @@ sub make_snpt_string {
     $snpt_str .= " -o ";
     $snpt_str .= $self->{_outside_if};
   }
-  $snpt_str .= " -j SNPT --src-pfx ";
-  $snpt_str .= $self->{_inside_pfx};
-  $snpt_str .= " --dst-pfx ";
+  $snpt_str .= " -j NETMAP ";
+  $snpt_str .= " --to ";
   $snpt_str .= $self->{_outside_pfx};
 
   return $snpt_str; 
@@ -93,7 +92,7 @@ sub make_snpt_string {
 
 # Make DNPT ip6tables string
 # PREROUTING
-# ip6tables -t mangle -I VYOS_NPT_HOOK -d outside-pfx -i outside-if -j DNPT --src-pfx outside-pfx --dst-pfx inside-pfx 
+# ip6tables -t nat -I VYOS_DNPT_HOOK -d outside-pfx -i outside-if -j NETMAP --to inside-pfx
 sub make_dnpt_string {
   my ($self) = @_;
   my $dnpt_str = "";
@@ -106,9 +105,8 @@ sub make_dnpt_string {
     $dnpt_str .= " -i ";
     $dnpt_str .= $self->{_outside_if};
   }
-  $dnpt_str .= " -j DNPT --src-pfx ";
-  $dnpt_str .= $self->{_outside_pfx};
-  $dnpt_str .= " --dst-pfx ";
+  $dnpt_str .= " -j NETMAP ";
+  $dnpt_str .= " --to ";
   $dnpt_str .= $self->{_inside_pfx};
 
   return $dnpt_str;
