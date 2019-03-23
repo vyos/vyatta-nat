@@ -265,7 +265,7 @@ sub rule_str {
   
   if ($use_netmap) {
     if (!defined $dst->{_network}){
-      return ("\ndestination address needs to be defined as a subnet with the same network prefix as translation address" .
+      return ("\ndestination address needs to be defined" .
               "\nwhen translation address is defined with a prefix for static network mapping "
               , undef);
     }
@@ -274,11 +274,6 @@ sub rule_str {
     my $dst_addr_mask = $dst->{_network};
     $inside_addr_mask =~ s/.+\///;
     $dst_addr_mask =~ s/.+\///;
-       if (!($inside_addr_mask == $dst_addr_mask)) {
-        return ("\ndestination address should be a subnet with the same network prefix as translation address" .
-                "\nwhen translation address is defined with a prefix for static network mapping"
-                , undef);
-      }
 
       if ($dst->{_network} =~ /\!/) {
         return ("\ncannot define a negated destination address when translation address" .
