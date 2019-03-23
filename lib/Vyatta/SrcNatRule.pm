@@ -305,11 +305,6 @@ sub rule_str {
     $outside_addr_mask =~ s/.+\///;
     $src_addr_mask =~ s/.+\///;
 
-    if (!($outside_addr_mask == $src_addr_mask)) {
-      return ("\nsource address should be a subnet with the same network prefix as translation address" .
-              "\nwhen translation address is defined with a prefix for static network mapping "
-              , undef);
-    }
 
     if ($src->{_network} =~ /\!/) {
       return ("\ncannot define a negated source address when translation address" .
