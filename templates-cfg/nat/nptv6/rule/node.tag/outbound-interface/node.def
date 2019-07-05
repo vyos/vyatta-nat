@@ -20,7 +20,7 @@ commit:expression: exec "
              fi
              let i++
         done
-        intf_group_name_array=\"eth+ bond+ br+ peth+ vtun+ tun+ wlm+ wlan+ vxlan+ vti+ l2tpeth+\"
+        intf_group_name_array=\"en+ eth+ bond+ br+ peth+ vtun+ tun+ wlm+ wlan+ vxlan+ vti+ l2tpeth+\"
         i=0
         for i in $intf_group_name_array; do
           if [ \"$i\" == \"$VAR(@)\" ]; then
