@@ -50,6 +50,10 @@ my %fields = (
                                },
                     _port => undef,
                    },
+  _nat_flags => {
+                    _persistent  => undef,
+                    _random      => undef,
+                   },
   _is_masq => undef
 );
 
@@ -77,7 +81,12 @@ sub setup {
   $self->{_exclude} = $config->exists("exclude");
   $self->{_disable} = $config->exists("disable");
   $self->{_log} = $config->returnValue("log");
-  
+
+  $self->{_nat_flags}->{_persistent}
+    = $config->exists("nat-flags persistent");
+  $self->{_nat_flags}->{_random}
+    = $config->exists("nat-flags random");
+
   $self->{_outside_addr}->{_addr}
     = $config->returnValue("translation address");
   if (defined($self->{_outside_addr}->{_addr}) && ($self->{_outside_addr}->{_addr} eq "masquerade")) {
@@ -112,6 +121,11 @@ sub setupOrig {
   $self->{_exclude} = $config->existsOrig("exclude");
   $self->{_disable} = $config->existsOrig("disable");
   $self->{_log} = $config->returnOrigValue("log");
+  
+  $self->{_nat_flags}->{_persistent}
+    = $config->existsOrig("nat-flags persistent");
+  $self->{_nat_flags}->{_random}
+    = $config->existsOrig("nat-flags random");
   
   $self->{_outside_addr}->{_addr}
     = $config->returnOrigValue("translation address");
@@ -275,6 +289,12 @@ sub rule_str {
          $jump_param .= " --to $to_src";
         } else {
            $jump_param .= " --to-source $to_src";
+	   if ("$self->{_nat_flags}->{_persistent}") {
+		   $jump_param .= " --persistent"
+	   }
+	   if ("$self->{_nat_flags}->{_random}") {
+		   $jump_param .= " --random"
+	   }
         }
       }
     } elsif (!defined($self->{_is_masq})) {
