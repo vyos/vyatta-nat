@@ -1,3 +1,9 @@
+vyatta-nat (1.3.0) unstable; urgency=low
+
+  * New release.
+
+ -- VyOS maintainers <maintainers@vyos.io>  Thu, 26 Aug 2021 18:57:00 +0200
+
 vyatta-nat (0.13.0+vyos2+current1) unstable; urgency=medium
 
   [ Thomas Jepp ]
