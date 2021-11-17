@@ -91,6 +91,10 @@ sub setup {
   }
   $self->{_inside_addr}->{_port}
     = $config->returnValue("translation port");
+
+  $self->{_address_mapping} = $config->returnValue("translation options address-mapping");
+  $self->{_port_mapping} = $config->returnValue("translation options port-mapping");
+
   $src->setup("$level source");
   $dst->setup("$level destination");
 
@@ -122,6 +126,9 @@ sub setupOrig {
   }
   $self->{_inside_addr}->{_port}
     = $config->returnOrigValue("translation port");
+
+  $self->{_address_mapping} = $config->returnOrigValue("translation options address-mapping");
+  $self->{_port_mapping} = $config->returnOrigValue("translation options port-mapping");
     
   $src->setupOrig("$level source");
   $dst->setupOrig("$level destination");
@@ -248,7 +255,18 @@ sub rule_str {
          $jump_target = 'NETMAP';
          $jump_param .= " $to_dst";
        } else {
-           $jump_param .= " $to_dst";
+         $jump_param .= " $to_dst";
+
+         my $addr_mapping = $self->{_address_mapping};
+         if(defined($addr_mapping)) {
+           if($addr_mapping eq "persistent") {
+             $jump_param .= " --persistent";
+           } elsif ($addr_mapping eq "random") {
+             # random is the default, do nothing
+           } else {
+             return ('address-mapping must be either "persistent" or "random"', undef);
+           }
+         }
        }
    } else {
      return ("translation address not specified", undef);

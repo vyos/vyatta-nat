@@ -268,28 +268,23 @@ sub rule_str {
       }
       $to_src .= "$port";
     }
+
+    my $port_mapping = $self->{_port_mapping};
+    if(defined($port_mapping) && !defined($self->{_is_masq})) {
+      return ('port-mapping option is only valid for masquerade rules', undef);
+    }
+
+    my $addr_mapping = $self->{_address_mapping};
+    if(defined($addr_mapping) && defined($self->{_is_masq})) {
+      return ('address-mapping option is not valid for masquerade rules', undef);
+    }
     
     if ($self->{_exclude}) {
       # translation address has no effect for "exclude" rules
     } elsif ($to_src ne '') {
       if (defined($self->{_is_masq})) {
         $jump_param .= " --to-ports $to_src";
-
-        my $port_mapping = $self->{_port_mapping};
-        if(defined($port_mapping)) {
-          if($port_mapping eq "random") {
-            $jump_param .= " --random-fully";
-          } elsif ($port_mapping eq "none") {
-            # none is the deault, do nothing
-          } else {
-            return ('port-mapping must be either "random" or "none"', undef);
-          }
-        }
       } else {
-        if(defined($self->{_port_mapping})) {
-          return ('port-mapping option is only valid for masquerade rules', undef);
-        }
-
         if ($use_netmap) {
          # replace "SNAT" with "NETMAP"
          $jump_target = 'NETMAP';
@@ -311,6 +306,16 @@ sub rule_str {
       }
     } elsif (!defined($self->{_is_masq})) {
       return ('translation address not specified', undef);
+    }
+
+    if(defined($port_mapping) && defined($self->{_is_masq})) {
+      if($port_mapping eq "random") {
+        $jump_param .= " --random-fully";
+      } elsif ($port_mapping eq "none") {
+        # none is the deault, do nothing
+      } else {
+        return ('port-mapping must be either "random" or "none"', undef);
+      }
     }
 
 

@@ -1,0 +1,6 @@
+type: txt
+help: Port mapping options
+val_help: random; Randomize source port mapping
+val_help: none; Do not apply port randomization (default)
+allowed: echo "random none"
+syntax:expression: exec "${vyos_libexec_dir}/validate-value --regex \'^(random|none)$\'   --value \'$VAR(@)\'"; "Invalid value"
