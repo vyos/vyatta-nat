@@ -3,4 +3,4 @@ help: Address mapping options
 val_help: persistent; Gives a client the same source or destination-address for each connection
 val_help: random; Random source or destination address allocation for each connection (defaut)
 allowed: echo "persistent random"
-syntax:expression: exec "${vyos_libexec_dir}/validate-value --regex \'^(persistent|random)$\'   --value \'$VAR(@)\'"; "Invalid value"
+syntax:expression: exec "${vyos_libexec_dir}/validate-value.py --regex \'^(persistent|random)$\'   --value \'$VAR(@)\'"; "Invalid value"
